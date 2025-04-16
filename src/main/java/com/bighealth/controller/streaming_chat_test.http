@@ -1,0 +1,37 @@
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+### 1. 初始化，demo需要，参数随便填，后台目前只使用了 from_id 来标识用户身份
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=口苦，经常有胃反酸&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+
+
+
+### 2. 提问，目前query参数随便写
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=多梦，胸闷&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+
+
+### 3. 根据提示，追问，目前query参数随便写
+
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=next&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+
+
+### 4. 继续输出另一份报告
+
+
+
+
