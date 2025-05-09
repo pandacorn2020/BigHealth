@@ -38,7 +38,7 @@ public class MeasureTools {
         ragQuery.setQuery(inputText);
         ragQuery.setEntities(entities);
         sessionData.setRagQuery(ragQuery);
-        String result = graphSearch.primarySearch(ragQuery);
+        String result = graphSearch.search(ragQuery);
         return result;
     }
 }

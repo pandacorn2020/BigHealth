@@ -57,27 +57,5 @@ public class Schemas {
         return Collections.unmodifiableCollection(SCHEMA_DIR_MAP.keySet());
     }
 
-    /**
-     * （1）西医循证及就医指导；
-     * （2）中医辩证及调理建议；
-     * （3）营养健康分析和调理建议；
-     * （4）免疫健康分析和调理建议；…。…。
-     *
-     * 二层菜单应该是：
-     * 中医辩证
-     * 免疫健康
-     * 营养健康
-     * 器官功能
-     * 衰老与退化
-     * @return
-     */
-    public static String[] primarySchemas() {
-        return new String[] {EBM, TCM, NUTR, IMM, CPM};
-    }
-
-    public static String[] secondarySchemas() {
-        return new String[] {TCM, IMM, NUTR, ORGAN, AGING};
-    }
-
 
 }

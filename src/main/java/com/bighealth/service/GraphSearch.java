@@ -40,11 +40,11 @@ public class GraphSearch {
     public static final int ENTITY_MAX_SIZE = 32;
 
 
-    public String primarySearch(RagQuery query) {
+    public String search(RagQuery query) {
         StringJoiner joiner = new StringJoiner("\n");
         String input = query.getQuery();
         String[] entities = query.getEntities();
-        for (String schema : Schemas.primarySchemas()) {
+        for (String schema : Schemas.SCHEMAS) {
             String result = search(schema, input, entities);
             if (result != null && !result.isEmpty()) {
                 joiner.add(result);
@@ -53,18 +53,6 @@ public class GraphSearch {
         return joiner.toString();
     }
 
-    public String secondarySearch(RagQuery query) {
-        String input = query.getQuery();
-        String[] entities = query.getEntities();
-        StringJoiner joiner = new StringJoiner("\n");
-        for (String schema : Schemas.secondarySchemas()) {
-            String result = search(schema, input, entities);
-            if (result != null && !result.isEmpty()) {
-                joiner.add(result);
-            }
-        }
-        return joiner.toString();
-    }
 
     private String search(String schema, String input, String[] entities) {
        /* switch (schema) {

@@ -176,111 +176,54 @@ public class StreamingChatController {
             executorService.submit(() -> {
                 try {
 
+                    // get json array from json node for HISTORY
+                    String[] historyMessages = chatHistory;
+                    setHistoryMessages(chatMemory, sysMessage, historyMessages);
+                    SessionData sessionData = new SessionData();
+                    MeasureTools measureTools = new MeasureTools(sessionData, graphSearch);
+                    // cast it as a string array
+                    StreamingChatController.Assistant assistant = AiServices.builder(StreamingChatController.Assistant.class)
+                            .streamingChatLanguageModel(streamingChatModel)
+                            .chatMemory(chatMemory)
+                            .tools(measureTools)
+                            .build();
 
-                    if (!input.trim().toLowerCase().equals(NEXT)) {
-
-
-                        // get json array from json node for HISTORY
-                        String[] historyMessages = chatHistory;
-                        setHistoryMessages(chatMemory, sysMessage, historyMessages);
-                        SessionData sessionData = new SessionData();
-                        MeasureTools measureTools = new MeasureTools(sessionData, graphSearch);
-                        // cast it as a string array
-                        StreamingChatController.Assistant assistant = AiServices.builder(StreamingChatController.Assistant.class)
-                                .streamingChatLanguageModel(streamingChatModel)
-                                .chatMemory(chatMemory)
-                                .tools(measureTools)
-                                .build();
-
-                        assistant.chat(input)
-                                .onNext(new Consumer<String>() {
-                                    @Override
-                                    public void accept(String s) {
-                                        System.out.print(s);
-                                        if (s.equals(END_OF_STREAMING_CHAT)) {
-                                            emitter.complete();
-                                        }
-                                        try {
-                                            emitter.send(s + "\n\n");
-                                        } catch (IOException e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                    }
-                                })
-                                .onComplete(new Consumer<Response<AiMessage>>() {
-                                    @Override
-                                    public void accept(Response<AiMessage> aiMessageResponse) {
-
-                                        emitter.complete();
-
-                                        String[] currentChatHistory = getChatHistory(chatMemory);
-                                        userData.put(KEY_HISTORY, currentChatHistory);
-                                        userData.put(KEY_INPUT, input);
-//                                        userData.put(KEY_ENTITIES, sessionData.getRagQuery().getEntities());
-                                        System.out.println("history: " + currentChatHistory);
-                                        System.out.println("\n结束了");
-                                    }
-                                })
-                                .onError(new Consumer<Throwable>() {
-                                    @Override
-                                    public void accept(Throwable throwable) {
-                                        System.out.println("发生错误：" + throwable.getMessage());
+                    assistant.chat(input)
+                            .onNext(new Consumer<String>() {
+                                @Override
+                                public void accept(String s) {
+                                    System.out.print(s);
+                                    if (s.equals(END_OF_STREAMING_CHAT)) {
                                         emitter.complete();
                                     }
-                                }).start();
-                    } else {
-                        RagQuery ragQuery = new RagQuery();
-                        ragQuery.setQuery((String) userData.get(KEY_INPUT));
-                        ragQuery.setEntities((String[]) userData.get(KEY_ENTITIES));
-
-                        String result = graphSearch.secondarySearch(ragQuery);
-                        String userPrompt = String.format(secondaryPrompt, (String) userData.get(KEY_INPUT), result);
-                        SessionData sessionData = new SessionData();
-                        sessionData.setRagQuery(ragQuery);
-//                        CustomWebSocketHandler.CustomStreamResponseHandler handler =
-//                                new CustomWebSocketHandler.CustomStreamResponseHandler(session, sessionData);
-//                        streamingChatModel.generate(userPrompt, handler);
-
-// 使用 StreamingChatLanguageModel 接口的 generate 方法来处理消息流
-                        streamingChatModel.generate(userPrompt, new StreamingResponseHandler<AiMessage>() {
-
-                            @Override
-                            public void onNext(String s) {
-                                System.out.print(s);
-                                if (s.equals(END_OF_STREAMING_CHAT)) {
-                                    emitter.complete();
+                                    try {
+                                        emitter.send(s + "\n\n");
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                 }
-                                try {
-                                    emitter.send(s + "\n\n");
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
-
-                            @Override
-                            public void onError(Throwable throwable) {
-                                System.out.println("发生错误：" + throwable.getMessage());
-                                emitter.complete();
-                            }
-
-                            @Override
-                            public void onComplete(Response<AiMessage> aiMessageResponse) {
+                            })
+                            .onComplete(new Consumer<Response<AiMessage>>() {
+                                @Override
+                                public void accept(Response<AiMessage> aiMessageResponse) {
 
                                     emitter.complete();
 
                                     String[] currentChatHistory = getChatHistory(chatMemory);
                                     userData.put(KEY_HISTORY, currentChatHistory);
                                     userData.put(KEY_INPUT, input);
-                                    userData.put(KEY_ENTITIES, sessionData.getRagQuery().getEntities());
+    //                                        userData.put(KEY_ENTITIES, sessionData.getRagQuery().getEntities());
                                     System.out.println("history: " + currentChatHistory);
                                     System.out.println("\n结束了");
-
-                            }
-
-                        });
-
-                    }
-
+                                }
+                            })
+                            .onError(new Consumer<Throwable>() {
+                                @Override
+                                public void accept(Throwable throwable) {
+                                    System.out.println("发生错误：" + throwable.getMessage());
+                                    emitter.complete();
+                                }
+                            }).start();
 //                    emitter.complete();  // 完成流式响应
                 } catch (Exception e) {
                     System.err.println("发生错误：" + e.getMessage());

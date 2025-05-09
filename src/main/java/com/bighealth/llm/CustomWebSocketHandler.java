@@ -95,31 +95,23 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
     public void handleChat(WebSocketSession session, JsonNode jsonNode) {
         String input = jsonNode.get(INPUT).asText();
-        if (input.trim().toLowerCase().equals(NEXT)) {
-            ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(17);
-            SystemMessage sysMessage = systemMessage(systemPrompt);
-            // get json array from json node for HISTORY
-            String[] historyMessages = convertJsonArrayToStringArray(jsonNode, HISTORY);
-            setHistoryMessages(chatMemory, sysMessage, historyMessages);
-            SessionData sessionData = new SessionData();
-            MeasureTools measureTools = new MeasureTools(sessionData, graphSearch);
-            // cast it as a string array
-            Assistant assistant = AiServices.builder(Assistant.class)
-                    .streamingChatLanguageModel(streamingChatModel)
-                    .chatMemory(chatMemory)
-                    .tools(measureTools)
-                    .build();
-            assistant.chat(input)
-                    .onNext(new ConsumerToken(session, sessionData))
-                    .onComplete(new ConsumerAiMessage(session, sessionData))
-                    .onError(new ConsumerError(session, sessionData)).start();
-        } else {
-            String query = jsonNode.get(QUERY).asText();
-            RagQuery ragQuery = new RagQuery();
-            ragQuery.setQuery(query);
-            ragQuery.setEntities(convertJsonArrayToStringArray(jsonNode, ENTITIES));
-            handleGetSecondaryReport(session, ragQuery);
-        }
+        ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(17);
+        SystemMessage sysMessage = systemMessage(systemPrompt);
+        // get json array from json node for HISTORY
+        String[] historyMessages = convertJsonArrayToStringArray(jsonNode, HISTORY);
+        setHistoryMessages(chatMemory, sysMessage, historyMessages);
+        SessionData sessionData = new SessionData();
+        MeasureTools measureTools = new MeasureTools(sessionData, graphSearch);
+        // cast it as a string array
+        Assistant assistant = AiServices.builder(Assistant.class)
+                .streamingChatLanguageModel(streamingChatModel)
+                .chatMemory(chatMemory)
+                .tools(measureTools)
+                .build();
+        assistant.chat(input)
+                .onNext(new ConsumerToken(session, sessionData))
+                .onComplete(new ConsumerAiMessage(session, sessionData))
+                .onError(new ConsumerError(session, sessionData)).start();
     }
 
     class ConsumerToken implements Consumer<String>
@@ -216,17 +208,6 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-
-    // Method to retrieve chat history for a session
-    public void handleGetSecondaryReport(WebSocketSession session, RagQuery ragQuery) {
-        String result = graphSearch.secondarySearch(ragQuery);
-        String userPrompt = String.format(secondaryPrompt, result);
-        SessionData sessionData = new SessionData();
-        sessionData.setRagQuery(ragQuery);
-        CustomStreamResponseHandler handler =
-                new CustomStreamResponseHandler(session, sessionData);
-        streamingChatModel.generate(userPrompt, handler);
-    }
 
     private List<String> getChatHistory(ChatMemory chatMemory) {
         if (chatMemory == null) {
