@@ -41,7 +41,7 @@ public class GraphSearch {
 
 
     public String search(RagQuery query) {
-        StringJoiner joiner = new StringJoiner("\n");
+        StringJoiner joiner = new StringJoiner("\n\n");
         String input = query.getQuery();
         String[] entities = query.getEntities();
         for (String schema : Schemas.SCHEMAS) {
@@ -87,8 +87,10 @@ public class GraphSearch {
 
     private String searchComplete(String schema, String input, String[] entities) {
         String schemaDescription = Schemas.getSchemaDescription(schema);
-        StringJoiner joiner = new StringJoiner("\n", String.format("<%s>", schemaDescription),
-                String.format("</%s>", schemaDescription));
+        StringJoiner joiner = new StringJoiner("\n",
+                schemaDescription + ":\n" +
+                        String.format("<%s>", schemaDescription),
+                String.format("</%s>\n", schemaDescription));
         searchSegments(Schemas.TCM, input, entities).forEach(segment -> {
             joiner.add(segment.getSegment());
         });
