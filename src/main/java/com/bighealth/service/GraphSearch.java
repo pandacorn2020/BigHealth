@@ -44,12 +44,12 @@ public class GraphSearch {
         StringJoiner joiner = new StringJoiner("\n\n");
         String input = query.getQuery();
         String[] entities = query.getEntities();
-        for (String schema : Schemas.SCHEMAS) {
-            String result = search(schema, input, entities);
-            if (result != null && !result.isEmpty()) {
-                joiner.add(result);
-            }
-        }
+        Arrays.stream(Schemas.SCHEMAS)
+                .parallel()
+                .map(schema -> search(schema, input, entities))
+                .filter(result -> result != null && !result.isEmpty())
+                .forEach(joiner::add);
+
         return joiner.toString();
     }
 
