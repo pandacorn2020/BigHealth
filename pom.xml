@@ -57,7 +57,11 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.java-websocket</groupId>
+            <artifactId>Java-WebSocket</artifactId>
+            <version>1.5.3</version>
+        </dependency>
         <dependency>
             <groupId>dev.ai4j</groupId>
             <artifactId>openai4j</artifactId>
