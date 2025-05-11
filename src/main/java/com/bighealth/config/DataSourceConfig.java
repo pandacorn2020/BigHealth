@@ -1,5 +1,6 @@
 package com.bighealth.config;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,11 +22,17 @@ public class DataSourceConfig {
     @Bean
     @Primary
     public DataSource dataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setUrl(dataSourceProperties.getUrl());
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setJdbcUrl(dataSourceProperties.getUrl());
         dataSource.setUsername(dataSourceProperties.getUsername());
         dataSource.setPassword(dataSourceProperties.getPassword());
         dataSource.setDriverClassName(dataSourceProperties.getDriverClassName());
+
+        // Set connection pool properties
+        dataSource.setMaximumPoolSize(10); // Maximum number of connections in the pool
+        dataSource.setMinimumIdle(5);     // Minimum number of idle connections
+        dataSource.setIdleTimeout(30000); // Idle timeout in milliseconds
+        dataSource.setMaxLifetime(1800000); // Maximum lifetime of a connection in milliseconds
 
         return dataSource;
     }
