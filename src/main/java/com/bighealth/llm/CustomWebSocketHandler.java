@@ -12,6 +12,7 @@ import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.output.Response;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.TokenStream;
+import org.apache.logging.log4j.Logger;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -36,6 +37,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     public static final String QUERY = "query";
     public static final String NEXT = "next";
 
+    private static Logger logger = org.apache.logging.log4j.LogManager.getLogger(CustomWebSocketHandler.class.getSimpleName());
     interface Assistant {
 
         TokenStream chat(String userMessage);
@@ -127,6 +129,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         @Override
         public void accept(String token) {
             try {
+                logger.info("send token to client: {}", token);
                 sendMessage(session, token);
             } catch (Throwable t) {
                 throw new RuntimeException(t);
@@ -177,8 +180,9 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             Map<String, Object> map = new HashMap<>();
             map.put(TOKEN, CloudStatement.END_OF_STREAMING_CHAT);
             map.put(HISTORY, getChatHistory(sessionData.getChatMemory()));
-            map.put(INPUT, sessionData.getRagQuery().getQuery());
-            map.put(ENTITIES, sessionData.getRagQuery().getEntities());
+            RagQuery ragQuery = sessionData.getRagQuery();
+            map.put(INPUT, ragQuery != null ? ragQuery.getQuery() : null);
+            map.put(ENTITIES, ragQuery != null ? ragQuery.getEntities() : null);
             ObjectMapper objectMapper = new ObjectMapper();
             session.sendMessage(new TextMessage(objectMapper.writeValueAsString(map)));
         } catch (Throwable t) {

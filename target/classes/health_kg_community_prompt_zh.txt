@@ -1,0 +1,10 @@
+请为以下实体和关系集合生成一个有意义的名称和摘要：
+%s
+
+%s
+
+根据以上信息，请为该社区提供一个合适的名称和摘要，请按照以下 json 格式生成：
+{
+    "name": "GeneratedCommunityName",
+    "summary": "GeneratedCommunitySummary"
+}
