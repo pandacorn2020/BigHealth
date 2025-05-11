@@ -1,0 +1,700 @@
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=733355F96C98AAF4FC7DE2453B9A9BCD
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T183850.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=有心慌，晚上容易醒，时常有眩晕&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=733355F96C98AAF4FC7DE2453B9A9BCD
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=733355F96C98AAF4FC7DE2453B9A9BCD
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T183745.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=有心慌，晚上容易醒，时常有眩晕&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=733355F96C98AAF4FC7DE2453B9A9BCD
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=733355F96C98AAF4FC7DE2453B9A9BCD
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T183641.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=头晕晕的，尤其是躺下后明显，腿没有劲、发沉&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=733355F96C98AAF4FC7DE2453B9A9BCD
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D27008D7C21E706A2DE9A9C30DDD4128
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T183458.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=头晕晕的，尤其是躺下后明显，腿没有劲、发沉&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D27008D7C21E706A2DE9A9C30DDD4128
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D27008D7C21E706A2DE9A9C30DDD4128
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T183402.200.json
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D27008D7C21E706A2DE9A9C30DDD4128
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T183355.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=经常有疲劳感、前胸有湿疹&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D27008D7C21E706A2DE9A9C30DDD4128
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=8671CF90828D952C169DA25E98B66A51
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T183232.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=有心慌，晚上容易醒，时常有眩晕&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=8671CF90828D952C169DA25E98B66A51
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=F4DE6B71B9922D8249FB369E1B4E5F96
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T164018.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=有心慌，晚上容易醒，时常有眩晕&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=F4DE6B71B9922D8249FB369E1B4E5F96
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=07907565B80E0E261FB2B4E14C77387C
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T163920.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=有心慌，晚上容易醒，时常有眩晕&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=07907565B80E0E261FB2B4E14C77387C
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=543C5B1FA88F6C4ADE68055283A6C4EE
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T163754.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=有心慌，晚上容易醒，时常有眩晕&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=543C5B1FA88F6C4ADE68055283A6C4EE
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=543C5B1FA88F6C4ADE68055283A6C4EE
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T163543.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=有心慌，晚上容易醒，时常有眩晕&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=543C5B1FA88F6C4ADE68055283A6C4EE
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D5C787B83A3AC00864F19CA7A13BB5DE
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T163146.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=有心慌，晚上容易醒，时常有眩晕&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D5C787B83A3AC00864F19CA7A13BB5DE
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=有心慌，晚上容易醒，时常有眩晕&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D5C787B83A3AC00864F19CA7A13BB5DE
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D5C787B83A3AC00864F19CA7A13BB5DE
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T111709.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=很多年，小腿痒，手挠后出水、结痂，反复发作&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D5C787B83A3AC00864F19CA7A13BB5DE
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D5C787B83A3AC00864F19CA7A13BB5DE
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T111519.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=很多年，小腿痒，手挠后出水、结痂，反复发作&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D5C787B83A3AC00864F19CA7A13BB5DE
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D6B53C408B56C4ADA74340821F2CB62F
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T111432.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=很多年，小腿痒，手挠后出水、结痂，反复发作&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D6B53C408B56C4ADA74340821F2CB62F
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D6B53C408B56C4ADA74340821F2CB62F
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T105927.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=失眠，能睡过去，容易醒&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D6B53C408B56C4ADA74340821F2CB62F
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D6B53C408B56C4ADA74340821F2CB62F
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T105800.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=失眠，不容易睡&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D6B53C408B56C4ADA74340821F2CB62F
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D6B53C408B56C4ADA74340821F2CB62F
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T105640.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=有心慌，晚上容易醒，时常有眩晕&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D6B53C408B56C4ADA74340821F2CB62F
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D6B53C408B56C4ADA74340821F2CB62F
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T105519.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=头晕晕的，尤其是躺下后明显，腿没有劲、发沉&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D6B53C408B56C4ADA74340821F2CB62F
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D6B53C408B56C4ADA74340821F2CB62F
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T105225.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=经常有疲劳感、前胸有湿疹&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=D6B53C408B56C4ADA74340821F2CB62F
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=7CD71BBDBD090F7D7E003A66E4E1E2AF
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-11T103155.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=经常有疲劳感、前胸有湿疹&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=7CD71BBDBD090F7D7E003A66E4E1E2AF
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=C4308DF4372B50F65566A19630B9B207
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-10T111138.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=多梦，胸闷&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=C4308DF4372B50F65566A19630B9B207
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=口苦，经常有胃反酸，多梦&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=C4308DF4372B50F65566A19630B9B207
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=C4308DF4372B50F65566A19630B9B207
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-10T093904.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=口苦，经常有胃反酸，多梦&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=C4308DF4372B50F65566A19630B9B207
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=2DF61362F0737860D558352285769097
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-05-10T092848.200.json
+
+###
+
+GET http://127.0.0.1:8080/stream-graph-chat?id=guest&input=口苦，经常有胃反酸，多梦&query=123
+Accept: text/event-stream; charset=UTF-8
+Accept-Charset: UTF-8
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=2DF61362F0737860D558352285769097
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://127.0.0.1:8080/askgraph/select
+Content-Type: application/json
+Content-Length: 139
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Cookie: JSESSIONID=2DF61362F0737860D558352285769097
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "from_id": "guest",
+  "from_nickname": "guest",
+  "content": "{\"schema\":\"haiguan\",\"chat_type\":\"agent\",\"is_streaming\":true}"
+}
+
+<> 2025-04-17T094448.200.json
+
+###
+

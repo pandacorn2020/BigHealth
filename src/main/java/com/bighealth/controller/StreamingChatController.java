@@ -146,7 +146,7 @@ public class StreamingChatController {
         System.out.println("query:" + query);
 
 
-        SseEmitter emitter = new SseEmitter(120000L);  // 设置超时为 60 秒
+        SseEmitter emitter = new SseEmitter(1200000L);  // 设置超时为 60 秒
         emitter.onTimeout(() -> {
             System.out.println("超时了！");
             emitter.complete();
