@@ -64,32 +64,42 @@ public class WebSocketCommandLineTool {
             WebSocket.Listener.super.onOpen(webSocket);
         }
 
+        private final StringBuilder messageBuilder = new StringBuilder();
+
         @Override
         public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
             try {
-                // Parse the received JSON message
-                JsonNode response = objectMapper.readTree(data.toString());
+                // Accumulate the fragments
+                messageBuilder.append(data);
 
-                // Extract and display only the "token" field
-                if (response.has("token")) {
-                    String token = response.get("token").asText();
+                // If this is the last fragment, process the complete message
+                if (last) {
+                    String completeMessage = messageBuilder.toString();
+                    messageBuilder.setLength(0); // Clear the builder for the next message
 
+                    // Parse the received JSON message
+                    JsonNode response = objectMapper.readTree(completeMessage);
 
-                    // Check if the token indicates the end of the response
-                    if (CloudStatement.END_OF_STREAMING_CHAT.equals(token)) {
-                        if (response.has("history")) {
-                            JsonNode historyNode = response.get("history");
-                            if (historyNode.isArray()) {
-                                history.clear(); // Clear the existing history
-                                for (JsonNode historyItem : historyNode) {
-                                    history.add(historyItem.asText());
+                    // Extract and display only the "token" field
+                    if (response.has("token")) {
+                        String token = response.get("token").asText();
+
+                        // Check if the token indicates the end of the response
+                        if (CloudStatement.END_OF_STREAMING_CHAT.equals(token)) {
+                            if (response.has("history")) {
+                                JsonNode historyNode = response.get("history");
+                                if (historyNode.isArray()) {
+                                    history.clear(); // Clear the existing history
+                                    for (JsonNode historyItem : historyNode) {
+                                        history.add(historyItem.asText());
+                                    }
                                 }
                             }
+                            System.out.println("");
+                            latch.countDown(); // Release the latch to allow the next input
+                        } else {
+                            System.out.print(token);
                         }
-                        System.out.println("");
-                        latch.countDown(); // Release the latch to allow the next input
-                    } else {
-                        System.out.print(token);
                     }
                 }
             } catch (Exception e) {

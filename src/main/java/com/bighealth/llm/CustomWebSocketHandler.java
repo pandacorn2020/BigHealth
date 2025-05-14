@@ -89,7 +89,13 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         JsonNode arrayNode = jsonNode.get(arrayFieldName);
         if (arrayNode != null && arrayNode.isArray()) {
             for (JsonNode element : arrayNode) {
-                list.add(element.asText());
+                String text = element.asText();
+                byte[] bytes = Base64.getDecoder().decode(text);
+                try {
+                    list.add(new String(bytes, "UTF-8"));
+                } catch (Exception e) {
+                    logger.error("Error decoding message: {}", e.getMessage());
+                }
             }
         }
         return list.toArray(new String[0]);
@@ -181,11 +187,9 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             Map<String, Object> map = new HashMap<>();
             map.put(TOKEN, CloudStatement.END_OF_STREAMING_CHAT);
             map.put(HISTORY, getChatHistory(sessionData.getChatMemory()));
-            RagQuery ragQuery = sessionData.getRagQuery();
-            map.put(INPUT, ragQuery != null ? ragQuery.getQuery() : null);
-            map.put(ENTITIES, ragQuery != null ? ragQuery.getEntities() : null);
             ObjectMapper objectMapper = new ObjectMapper();
-            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(map)));
+            String text =  objectMapper.writeValueAsString(map);
+            session.sendMessage(new TextMessage(text));
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
@@ -216,7 +220,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
     private List<String> getChatHistory(ChatMemory chatMemory) {
         if (chatMemory == null) {
-            return Collections.emptyList();
+            return Collections.EMPTY_LIST;
         }
         List<ChatMessage> messages = chatMemory.messages();
         List<String> history = new ArrayList<>();
@@ -224,7 +228,13 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             if (message instanceof SystemMessage) {
                 continue;
             }
-            history.add(message.toString());
+            try {
+                byte[] bytes = message.toString().getBytes("UTF-8");
+                String s = Base64.getEncoder().encodeToString(bytes);
+                history.add(s);
+            } catch (Exception e) {
+                logger.error("Error encoding message: {}", e.getMessage());
+            }
         }
         return history;
     }
