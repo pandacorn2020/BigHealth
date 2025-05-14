@@ -36,7 +36,7 @@ public class JdbcRepository {
         }
     };
 
-    private RowMapper<KGEntity> kgEntityRowMapper1 = new RowMapper<KGEntity>() {
+    private RowMapper<KGEntity> noScoreKgEntityRowMapper = new RowMapper<KGEntity>() {
         @Override
         public KGEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
             KGEntity kgEntity = new KGEntity();
@@ -76,6 +76,17 @@ public class JdbcRepository {
         }
     };
 
+    private RowMapper<KGSegment> noScoreKgSegmentRowMapper = new RowMapper<KGSegment>() {
+        @Override
+        public KGSegment mapRow(ResultSet rs, int rowNum) throws SQLException {
+            KGSegment kgSegment = new KGSegment();
+            kgSegment.setId(rs.getLong("id"));
+            kgSegment.setSegment(rs.getString("segment"));
+            return kgSegment;
+        }
+    };
+
+
     private RowMapper<KGCommunity> kgCommunityRowMapper = new RowMapper<KGCommunity>() {
         @Override
         public KGCommunity mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -83,6 +94,16 @@ public class JdbcRepository {
             if (score < KG_COMMINITY_SCORE) {
                 return null;
             }
+            KGCommunity kgCommunity = new KGCommunity();
+            kgCommunity.setName(rs.getString("name"));
+            kgCommunity.setSummary(rs.getString("summary"));
+            return kgCommunity;
+        }
+    };
+
+    private RowMapper<KGCommunity> noScoreKgCommunityRowMapper = new RowMapper<KGCommunity>() {
+        @Override
+        public KGCommunity mapRow(ResultSet rs, int rowNum) throws SQLException {
             KGCommunity kgCommunity = new KGCommunity();
             kgCommunity.setName(rs.getString("name"));
             kgCommunity.setSummary(rs.getString("summary"));
@@ -100,6 +121,15 @@ public class JdbcRepository {
                 .collect(Collectors.toList());
     }
 
+    public List<KGEntity> getAllEntities(String schema) {
+        String sql = "SELECT * FROM %s.kgentity";
+        sql = String.format(sql, schema);
+        List<KGEntity> entities = jdbcTemplate.query(sql, noScoreKgEntityRowMapper);
+        return entities.stream()
+                .filter(entity -> entity != null)
+                .collect(Collectors.toList());
+    }
+
     // Method to get entities
     public List<KGEntity> getEntities(String schema, String[] es, int topCount) {
         List<KGEntity> entities = new ArrayList<>();
@@ -110,21 +140,13 @@ public class JdbcRepository {
     }
 
     // Method to get relationships
-    public List<KGRelationship> getRelationships(String schema, String[] names) {
-        String sql = "SELECT * FROM %s.kgrelationship WHERE source = ?";
-        List<KGRelationship> relationships = new ArrayList<>();
-        for (String name : names) {
-            String localSql = String.format(sql, schema);
-            List<KGRelationship> list = jdbcTemplate.query(localSql, kgRelationshipRowMapper, name);
-            relationships.addAll(list);
-        }
-        sql = "SELECT * FROM %s.kgrelationship WHERE target = ?";
-        for (String name : names) {
-            String localSql = String.format(sql, schema);
-            List<KGRelationship> list = jdbcTemplate.query(localSql, kgRelationshipRowMapper, name);
-            relationships.addAll(list);
-        }
-        return relationships;
+    public List<KGRelationship> getAllRelationships(String schema) {
+        String sql = "SELECT * FROM %s.kgrelationship";
+        sql = String.format(sql, schema);
+        List<KGRelationship> relationships = jdbcTemplate.query(sql, kgRelationshipRowMapper);
+        return relationships.stream()
+                .filter(relationship -> relationship != null)
+                .collect(Collectors.toList());
     }
 
     // Method to perform semantic search for segments
@@ -137,11 +159,29 @@ public class JdbcRepository {
                 .collect(Collectors.toList());
     }
 
+    public List<KGSegment> getAllSegments(String schema) {
+        String sql = "SELECT * FROM %s.kgsegment";
+        sql = String.format(sql, schema);
+        List<KGSegment> segments = jdbcTemplate.query(sql, noScoreKgSegmentRowMapper);
+        return segments.stream()
+                .filter(segment -> segment != null)
+                .collect(Collectors.toList());
+    }
+
     // Method to perform semantic search for communities
     public List<KGCommunity> semanticSearchForCommunities(String schema, String input, int topCount) {
         String sql = "SELECT * FROM %s.kgcommunity WHERE summary vsearch ? top %d";
         sql = String.format(sql, schema, topCount);
         List<KGCommunity> communities = jdbcTemplate.query(sql, kgCommunityRowMapper, input);
+        return communities.stream()
+                .filter(community -> community != null)
+                .collect(Collectors.toList());
+    }
+
+    public List<KGCommunity> getAllCommunities(String schema) {
+        String sql = "SELECT * FROM %s.kgcommunity";
+        sql = String.format(sql, schema);
+        List<KGCommunity> communities = jdbcTemplate.query(sql, noScoreKgCommunityRowMapper);
         return communities.stream()
                 .filter(community -> community != null)
                 .collect(Collectors.toList());
@@ -238,7 +278,7 @@ public class JdbcRepository {
     public KGEntity findKGEntityById(String schema, String id) {
         try {
             String sql = String.format("SELECT * FROM %s.kgentity WHERE name = ?", schema);
-            return jdbcTemplate.queryForObject(sql, kgEntityRowMapper1, id);
+            return jdbcTemplate.queryForObject(sql, noScoreKgEntityRowMapper, id);
         } catch (Exception e) {
             return null;
         }

@@ -1,5 +1,6 @@
 package com.bighealth.entity;
 
+import com.bighealth.service.GraphSearch;
 import com.google.common.base.Stopwatch;
 import com.bighealth.llm.KgCommunityTask;
 import com.bighealth.llm.KgEntityDupRemovalTask;
@@ -8,6 +9,8 @@ import com.bighealth.repository.*;
 import com.bighealth.service.DocumentLoader;
 import com.bighealth.service.GraphBuilder;
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.clustering.LabelPropagationClustering;
@@ -18,8 +21,6 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static com.bighealth.service.GraphBuilder.BATCH_SIZE;
 
@@ -27,7 +28,7 @@ import static com.bighealth.service.GraphBuilder.BATCH_SIZE;
  * Contains list of entities and relationships in the Knowledge Graph
  */
 public class KGGraph {
-    private static final Logger logger = java.util.logging.Logger.getLogger(KGGraph.class.getSimpleName());
+    private static final Logger logger = LogManager.getLogger(KGGraph.class.getSimpleName());
 
     private String schema;
     private List<KGSegment> segments;
@@ -67,8 +68,20 @@ public class KGGraph {
         this.entityMap.put(entity.getName(), entity);
     }
 
-    public int size() {
+    public int entitySize() {
         return entityMap.size();
+    }
+
+    public int relationshipSize() {
+        return relationshipMap.size();
+    }
+
+    public int communitySize() {
+        return communityMap.size();
+    }
+
+    public int segmentSize() {
+        return segments.size();
     }
 
     public void addRelationship(KGRelationship relationship) {
@@ -137,25 +150,25 @@ public class KGGraph {
             KGEntity source = entityMap.get(relationship.getSource());
             KGEntity target = entityMap.get(relationship.getTarget());
             if (source == null || target == null) {
-                logger.log(Level.WARNING, "Source or target not found for relationship: {0}, source: {1}/{2}, " +
-                        "target: {3}/{4}", new Object[]{relationship, relationship.getSource(), source,
-                        relationship.getTarget(), target});
+                logger.info("Source or target not found for relationship: {}, source: {}/{}, " +
+                        "target: {}/{}", relationship, relationship.getSource(), source,
+                        relationship.getTarget(), target);
                 continue;
             }
             if (source.equals(target)) {
-                logger.log(Level.INFO, "Skipping self-loop for relationship: {0}, source: {1}, target: {2}",
-                        new Object[]{relationship, source.getName(), target.getName()});
+                logger.info("Skipping self-loop for relationship: {}, source: {}, target: {}",
+                        relationship, source.getName(), target.getName());
                 continue;
             }
-            logger.log(Level.INFO, "Adding edge from {0} to {1} with relationship {2}",
-                    new Object[]{source.getName(), target.getName(), relationship});
+            logger.info("Adding edge from {} to {} with relationship {}",
+                    source.getName(), target.getName(), relationship);
             graph.addEdge(source, target, relationship);
         }
         return graph;
     }
 
     public void buildCommunities(GraphBuilder graphBuilder) {
-        logger.log(java.util.logging.Level.INFO, "Building communities...");
+        logger.info("Building communities...");
         Stopwatch watch = Stopwatch.createStarted();
         Graph<KGEntity, KGRelationship> graph = toGraph();
         List<KgCommunityTask> taskList = getKgCommunityTasks(graphBuilder, graph);
@@ -168,8 +181,8 @@ public class KGGraph {
             KGCommunity community = new KGCommunity(data.getName(), data.getSummary());
             addCommunity(community);
         }
-        logger.log(java.util.logging.Level.INFO, "Building communities took {0} ms, community count: {1}",
-                new Object[] {watch.elapsed().toMillis(), communityMap.size()});
+        logger.info("Building communities took {} ms, community count: {}",
+                watch.elapsed().toMillis(), communityMap.size());
     }
 
     @NotNull
@@ -211,8 +224,8 @@ public class KGGraph {
                     for (Future<CommunityData> future : subList) {
                         dataList.add(future.get());
                     }
-                    logger.log(java.util.logging.Level.INFO, "Batch get community data took {0} ms, index: {1}/{2}",
-                            new Object[] {watch.elapsed().toMillis(), index, taskList.size()});
+                    logger.info("Batch get community data took {} ms, index: {}/{}",
+                            watch.elapsed().toMillis(), index, taskList.size());
                     futureList.clear();
                 }
             }
@@ -223,8 +236,8 @@ public class KGGraph {
             for (Future<CommunityData> future : futureList) {
                 dataList.add(future.get());
             }
-            logger.log(java.util.logging.Level.INFO, "Batch get community data took {0} ms, index: {1}/{2}",
-                    new Object[] {watch.elapsed().toMillis(), index, taskList.size()});
+            logger.info("Batch get community data took {} ms, index: {}/{}",
+                    watch.elapsed().toMillis(), index, taskList.size());
             return dataList;
         } catch (Throwable t) {
             throw new RuntimeException(t);
@@ -239,17 +252,17 @@ public class KGGraph {
     }
 
     private void saveSegments(GraphBuilder graphBuilder) {
-        logger.log(java.util.logging.Level.INFO, "Saving segments...");
+        logger.info("Saving segments...");
         Stopwatch watch = Stopwatch.createStarted();
         JdbcRepository repository = graphBuilder.getJdbcRepository();
         repository.saveAllKGSegments(schema, segments);
-        logger.log(java.util.logging.Level.INFO, "Saving segments took {0} ms, size: {1}",
-                new Object[] {watch.elapsed().toMillis(), segments.size()});
+        logger.info("Saving segments took {} ms, size: {}",
+                watch.elapsed().toMillis(), segments.size());
 
     }
 
     private void saveEntities(GraphBuilder graphBuilder) {
-        logger.log(java.util.logging.Level.INFO, "Saving entities...");
+        logger.info("Saving entities...");
         Stopwatch watch = Stopwatch.createStarted();
         Collection<KGEntity> entities = entityMap.values();
         List<KGEntity> mergedEntityList = new ArrayList<>();
@@ -259,7 +272,7 @@ public class KGGraph {
             KGEntity currentEntity = e.findKGEntityById(schema, entity.getName());
             if (currentEntity != null) {
                 entity.merge(currentEntity);
-                logger.log(java.util.logging.Level.INFO, "delete entity: {0}", currentEntity.getName());
+                logger.info("delete entity: {}", currentEntity.getName());
                 graphBuilder.getJdbcRepository().deleteKGEntityById(schema, currentEntity.getName());
             }
             if (entity.isMerged()) {
@@ -269,8 +282,8 @@ public class KGGraph {
             }
         }
         graphBuilder.getJdbcRepository().saveAllKGEntities(schema, entityList);
-        logger.log(java.util.logging.Level.INFO, "Saving entities took {0} ms, size: {1}",
-                new Object[] {watch.elapsed().toMillis(), entityList.size()});
+        logger.info("Saving entities took {} ms, size: {}",
+                watch.elapsed().toMillis(), entityList.size());
         if (mergedEntityList.isEmpty()) {
             return;
         }
@@ -286,12 +299,12 @@ public class KGGraph {
         }
         graphBuilder.batchExecuteTasks(taskList);
         graphBuilder.getJdbcRepository().saveAllKGEntities(schema, mergedEntityList);
-        logger.log(java.util.logging.Level.INFO, "Saving entities took {0} ms, size: {1}",
-                new Object[] {watch.elapsed().toMillis(), mergedEntityList.size()});
+        logger.info("Saving entities took {} ms, size: {}",
+                watch.elapsed().toMillis(), mergedEntityList.size());
     }
 
     private void saveRelationships(GraphBuilder graphBuilder) {
-        logger.log(java.util.logging.Level.INFO, "Saving relationships...");
+        logger.info("Saving relationships...");
         Stopwatch watch = Stopwatch.createStarted();
         Collection<KGRelationship> relationships = relationshipMap.values();
         List<KGRelationship> mergedRelationshipList = new ArrayList<>();
@@ -302,7 +315,7 @@ public class KGGraph {
                     repository.findKGRelationshipById(schema, relationship.getId());
             if (currentRelationship != null) {
                 relationship.merge(currentRelationship);
-                logger.log(java.util.logging.Level.INFO, "delete relationship: {0}", currentRelationship.getId());
+                logger.info("delete relationship: {}", currentRelationship.getId());
                 repository.deleteKGRelationshipById(schema, currentRelationship.getId());
             }
             if (relationship.isMerged()) {
@@ -312,8 +325,8 @@ public class KGGraph {
             }
         }
         repository.saveAllKGRelationships(schema, relationshipList);
-        logger.log(java.util.logging.Level.INFO, "Saving relationships took {0} ms, size: {1}",
-                new Object[] {watch.elapsed().toMillis(), relationshipList.size()});
+        logger.info("Saving relationships took {} ms, size: {}",
+                watch.elapsed().toMillis(), relationshipList.size());
         if (mergedRelationshipList.isEmpty()) {
             return;
         }
@@ -329,20 +342,60 @@ public class KGGraph {
         }
         graphBuilder.batchExecuteTasks(taskList);
         repository.saveAllKGRelationships(schema, mergedRelationshipList);
-        logger.log(java.util.logging.Level.INFO, "Saving merged relationships took {0} ms, size: {1}",
-                new Object[] {watch.elapsed().toMillis(), mergedRelationshipList.size()});
+        logger.info("Saving merged relationships took {} ms, size: {}",
+                watch.elapsed().toMillis(), mergedRelationshipList.size());
     }
 
     private void saveCommunities(GraphBuilder graphBuilder) {
-        logger.log(java.util.logging.Level.INFO, "Saving communities...");
+        logger.info("Saving communities...");
         Stopwatch watch = Stopwatch.createStarted();
         Collection<KGCommunity> communities = communityMap.values();
         List<KGCommunity> communityList = new ArrayList<>(communities);
         JdbcRepository repository = graphBuilder.getJdbcRepository();
         repository.saveAllKGCommunities(schema, communityList);
-        logger.log(java.util.logging.Level.INFO, "Saving communities took {0} ms, size: {1}",
-                new Object[] {watch.elapsed().toMillis(), communityList.size()});
+        logger.info("Saving communities took {} ms, size: {}",
+                watch.elapsed().toMillis(), communityList.size());
 
+    }
+
+    public void load(GraphSearch builder) {
+        logger.info("Loading graph for schema: {} ...", schema);
+        Stopwatch watch = Stopwatch.createStarted();
+        JdbcRepository repository = builder.getJdbcRepository();
+        List<KGSegment> segments = repository.getAllSegments(schema);
+        for (KGSegment segment : segments) {
+            addSegment(segment);
+        }
+        List<KGEntity> entities = repository.getAllEntities(schema);
+        for (KGEntity entity : entities) {
+            addEntity(entity);
+        }
+        List<KGRelationship> relationships = repository.getAllRelationships(schema);
+        for (KGRelationship relationship : relationships) {
+            addRelationship(relationship);
+        }
+        List<KGCommunity> communities = repository.getAllCommunities(schema);
+        for (KGCommunity community : communities) {
+            addCommunity(community);
+        }
+        logger.info("Loading graph for schema {} took {} ms, entitySize: {}, " +
+                        "relationshipSize: {}, communitySize: {}, segmentSize: {}",
+                schema, watch.elapsed().toMillis(), entitySize(), relationshipSize(),
+                communitySize(), segmentSize());
+    }
+
+    public KGEntity getEntityById(String id) {
+        return entityMap.get(id);
+    }
+
+    public List<KGRelationship> getRelationships(String id) {
+        List<KGRelationship> relationships = new ArrayList<>();
+        for (KGRelationship relationship : relationshipMap.values()) {
+            if (relationship.getSource().equals(id) || relationship.getTarget().equals(id)) {
+                relationships.add(relationship);
+            }
+        }
+        return relationships;
     }
 
 }

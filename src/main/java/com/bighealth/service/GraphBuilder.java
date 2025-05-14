@@ -141,7 +141,7 @@ public class GraphBuilder {
             }
         }
         logger.log(Level.INFO, "Building communities for schema: {0}, size: {1}",
-                new Object[] {schemaName, graph.size()});
+                new Object[] {schemaName, graph.entitySize()});
         graph.buildCommunities(this);
         graph.save(this);
         jdbcRepository.saveKGFile(schemaName, description);
@@ -393,4 +393,5 @@ public class GraphBuilder {
     public JdbcRepository getJdbcRepository() {
         return jdbcRepository;
     }
+
 }

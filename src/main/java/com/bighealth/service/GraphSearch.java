@@ -1,12 +1,10 @@
 package com.bighealth.service;
 
-import com.bighealth.entity.KGCommunity;
-import com.bighealth.entity.KGEntity;
-import com.bighealth.entity.KGRelationship;
-import com.bighealth.entity.KGSegment;
+import com.bighealth.entity.*;
 import com.bighealth.llm.LLMModel;
 import com.bighealth.llm.RagQuery;
 import com.bighealth.repository.*;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,19 +12,7 @@ import java.util.*;
 
 @Service
 public class GraphSearch {
-    public static final int MAX_COUNT = 4096;
-
-    @Autowired
-    private KGEntityRepository entityRepository;
-
-    @Autowired
-    private KGSegmentRepository segmentRepository;
-
-    @Autowired
-    private KGRelationshipRepository relationshipRepository;
-
-    @Autowired
-    private KGCommunityRepository communityRepository;
+    public static final int MAX_COUNT = 32;
 
     @Autowired
     private JdbcRepository jdbcRepository;
@@ -34,142 +20,223 @@ public class GraphSearch {
     @Autowired
     private LLMModel llmModel;
 
-    public static final int RELATIONSHIP_MAX_SIZE = 100;
+    public static final int RELATIONSHIP_MAX_SIZE = 128;
     public static final int DOC_SEGMENT_MAX_SIZE = 8;
 
-    public static final int ENTITY_MAX_SIZE = 32;
+    public static final int ENTITY_MAX_SIZE = 64;
+
+    private Map<String, KGGraph> graphMap = new HashMap<>();
+
+    public GraphSearch() {
+
+    }
+
+    @PostConstruct
+    public void initialize() {
+        loadGraphs();
+    }
+
+    public void loadGraphs() {
+        String[] schemas = Schemas.SCHEMAS;
+        for (String schema : schemas) {
+            KGGraph graph = new KGGraph(schema);
+            graph.load(this);
+            graphMap.put(schema, graph);
+        }
+    }
+
+    public int getMaxRelationshipSize(String schema) {
+        switch (schema) {
+            case Schemas.TCM:
+            case Schemas.EBM:
+                return RELATIONSHIP_MAX_SIZE * 2;
+            default:
+                break;
+        }
+        return RELATIONSHIP_MAX_SIZE;
+    }
+
+    public int getMaxEntitySize(String schema) {
+        switch (schema) {
+            case Schemas.TCM:
+            case Schemas.EBM:
+                return ENTITY_MAX_SIZE * 2;
+            default:
+                break;
+        }
+        return ENTITY_MAX_SIZE;
+    }
 
 
     public String search(RagQuery query) {
-        StringJoiner joiner = new StringJoiner("\n\n");
+        StringJoiner joiner = new StringJoiner("\n\n",
+                "\n<健康数据>\n", "\n</健康数据>\n");
         String input = query.getQuery();
         String[] entities = query.getEntities();
+        for (String schema : Schemas.SCHEMAS) {
+            String result = search(schema, input, entities);
+            joiner.add(result);
+        }
+        /*
         Arrays.stream(Schemas.SCHEMAS)
                 .parallel()
                 .map(schema -> search(schema, input, entities))
                 .filter(result -> result != null && !result.isEmpty())
                 .forEach(joiner::add);
 
+         */
         return joiner.toString();
     }
 
 
     private String search(String schema, String input, String[] entities) {
-       /* switch (schema) {
-            case Schemas.TCM:
-                return searchComplete(schema, input, entities);
-            default:
-                return searchSchema(schema, input, entities);
-        }*/
         return searchComplete(schema, input, entities);
-    }
-
-    private String searchSchema(String schema, String input, String[] entities) {
-        String schemaDescription = Schemas.getSchemaDescription(schema);
-        StringJoiner joiner = new StringJoiner("\n", String.format("<%s>", schemaDescription),
-                String.format("</%s>", schemaDescription));
-        searchSegments(schema, input, entities).forEach(segment -> {
-            joiner.add(segment.getSegment());
-        });
-        searchCommunities(schema, input, entities).forEach(community -> {
-            joiner.add(community.getSummary());
-        });
-        List<KGEntity> entityList = searchEntities(schema, entities);
-        if (entityList.isEmpty()) {
-            return joiner.toString();
-        }
-        List<KGRelationship> relationships = searchRelationships(schema, entityList);
-        for (KGRelationship relationship : relationships) {
-            joiner.add(relationship.getDescription());
-        }
-        return joiner.toString();
     }
 
     private String searchComplete(String schema, String input, String[] entities) {
         String schemaDescription = Schemas.getSchemaDescription(schema);
-        StringJoiner joiner = new StringJoiner("\n",
-                schemaDescription + ":\n" +
-                        String.format("<%s>", schemaDescription),
-                String.format("</%s>\n", schemaDescription));
-        searchSegments(Schemas.TCM, input, entities).forEach(segment -> {
-            joiner.add(segment.getSegment());
-        });
-        searchCommunities(Schemas.TCM, input, entities).forEach(community -> {
-            joiner.add(community.getSummary());
-        });
-        List<KGEntity> entityList = searchEntities(Schemas.TCM, entities);
+        StringJoiner joiner = initializeSchemaJoiner(schemaDescription);
+
+        addSegmentsToJoiner(schema, input, entities, joiner);
+        addCommunitiesToJoiner(schema, input, entities, joiner);
+
+        List<KGEntity> entityList = searchEntities(schema, entities);
+        entityList = processEntitiesForSymptoms(schema, entities, entityList);
+
+        if (!entityList.isEmpty()) {
+            addRelationshipsToJoiner(schema, entityList, joiner);
+        }
+
+        return joiner.toString();
+    }
+
+    private StringJoiner initializeSchemaJoiner(String schemaDescription) {
+        return new StringJoiner("\n",
+                "\n" + schemaDescription + ":\n" + String.format("<%s>\n", schemaDescription),
+                String.format("\n</%s>\n", schemaDescription));
+    }
+
+    private void addSegmentsToJoiner(String schema, String input, String[] entities, StringJoiner joiner) {
+        searchSegments(schema, input, entities).forEach(segment -> joiner.add(segment.getSegment()));
+    }
+
+    private void addCommunitiesToJoiner(String schema, String input, String[] entities, StringJoiner joiner) {
+        searchCommunities(schema, input, entities).forEach(community -> joiner.add(community.getSummary()));
+    }
+
+    private List<KGEntity> processEntitiesForSymptoms(String schema, String[] entities, List<KGEntity> entityList) {
         boolean hasSymptom = false;
         List<KGEntity> nonSymptomList = new ArrayList<>();
+
         for (KGEntity kgEntity : entityList) {
-            String type = kgEntity.getType();
-            switch (type) {
-                case "症状":
-                case "临床表现":
-                case "病症":
-                    hasSymptom = true;
-                    break;
-                default:
-                    nonSymptomList.add(kgEntity);
+            if (isSymptom(kgEntity.getType())) {
+                hasSymptom = true;
+            } else {
+                nonSymptomList.add(kgEntity);
             }
         }
 
-        if (hasSymptom) {
-            Map<String, DiseaseSymptoms> map = new HashMap<>();
-            // get the top 3
-            // try to search all the symptoms for diseases, symptom is target, therefore, we
-            // set source to false and filter duplicate
+        if (!hasSymptom) {
+            entityList = handleNoSymptoms(schema, entities, nonSymptomList);
+        } else {
+            entityList = handleSymptoms(schema, entityList, nonSymptomList);
+        }
 
-            List<KGRelationship> relationships = searchRelationships(Schemas.TCM, entityList);
-            for (KGRelationship relationship : relationships) {
-                String source = relationship.getSource();
-                KGEntity entity = entityRepository.findById(source).orElse(null);
-                if (entity == null) {
+        return entityList;
+    }
+
+    private boolean isSymptom(String type) {
+        return "症状".equals(type) || "临床表现".equals(type) || "病症".equals(type);
+    }
+
+    private List<KGEntity> handleNoSymptoms(String schema, String[] entities, List<KGEntity> nonSymptomList) {
+        boolean hasSymptom = false;
+        if (!schema.equals(Schemas.TCM) && !schema.equals(Schemas.EBM)) {
+            KGGraph graph = graphMap.get(schema);
+            List<KGEntity> entityList = new ArrayList<>();
+            List<KGEntity> tcmEntityList = searchEntities(Schemas.TCM, entities);
+            for (KGEntity kgEntity : tcmEntityList) {
+                KGEntity localEntity = graph.getEntityById(kgEntity.getName());
+                if (localEntity == null) {
                     continue;
                 }
-                String type = entity.getType();
-                switch (type) {
-                    case "病症":
-                    case "疾病":
-                        String name = entity.getName();
-                        DiseaseSymptoms d = map.computeIfAbsent(name, r -> {
-                            return new DiseaseSymptoms(entity);
-                        });
-                        d.add(relationship);
-                        break;
-                    default:
-                        String relationshipType = relationship.getRelation();
-                        switch (relationshipType) {
-                            case "表现":
-                            case "易发症状":
-                            case "常见表现":
-                            case "临床表现":
-                                nonSymptomList.add(entity);
-                        }
+                entityList.add(localEntity);
+                if (!isSymptom(kgEntity.getType())) {
+                    nonSymptomList.add(kgEntity);
+                } else {
+                    hasSymptom = true;
                 }
             }
-            DiseaseSymptoms[] diseaseSymptoms = map.values().toArray(DiseaseSymptoms[]::new);
-            Arrays.sort(diseaseSymptoms);
-            int count = 0;
-            List<String> diseaseNames = new ArrayList<>();
-            for (DiseaseSymptoms d : diseaseSymptoms) {
-                diseaseNames.add(d.disease.getName());
-                count++;
-                if (count >= MAX_COUNT) {
-                    break;
-                }
+            if (hasSymptom) {
+                handleSymptoms(schema, entityList, nonSymptomList);
             }
-            List<KGEntity> diseaseList = searchEntities(Schemas.TCM, diseaseNames.toArray(String[]::new));
-            diseaseList.addAll(nonSymptomList);
-            entityList = diseaseList;
         }
-        if (entityList.isEmpty()) {
-            return joiner.toString();
+        return nonSymptomList;
+    }
+
+    private List<KGEntity> handleSymptoms(String schema, List<KGEntity> entityList, List<KGEntity> nonSymptomList) {
+        KGGraph graph = graphMap.get(schema);
+        Map<String, DiseaseSymptoms> map = new HashMap<>();
+
+        List<KGRelationship> relationships = searchRelationships(schema, entityList);
+        for (KGRelationship relationship : relationships) {
+            processRelationship(graph, map, relationship, nonSymptomList);
         }
-        List<KGRelationship> relationships = searchRelationships(Schemas.TCM, entityList);
+
+        return buildEntityListFromSymptoms(map, nonSymptomList, schema);
+    }
+
+    private void processRelationship(KGGraph graph, Map<String, DiseaseSymptoms> map, KGRelationship relationship, List<KGEntity> nonSymptomList) {
+        String source = relationship.getSource();
+        KGEntity entity = graph.getEntityById(source);
+
+        if (entity == null) {
+            return;
+        }
+
+        if (isDisease(entity.getType())) {
+            map.computeIfAbsent(entity.getName(), r -> new DiseaseSymptoms(entity)).add(relationship);
+        } else if (isSymptomRelationship(relationship.getRelation())) {
+            nonSymptomList.add(entity);
+        }
+    }
+
+    private boolean isDisease(String type) {
+        return "病症".equals(type) || "疾病".equals(type);
+    }
+
+    private boolean isSymptomRelationship(String relationshipType) {
+        switch (relationshipType) {
+            case "表现":
+            case "易发症状":
+            case "常见表现":
+            case "临床表现":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private List<KGEntity> buildEntityListFromSymptoms(Map<String, DiseaseSymptoms> map, List<KGEntity> nonSymptomList, String schema) {
+        DiseaseSymptoms[] diseaseSymptoms = map.values().toArray(DiseaseSymptoms[]::new);
+        Arrays.sort(diseaseSymptoms);
+
+        List<String> diseaseNames = new ArrayList<>();
+        for (int i = 0; i < Math.min(diseaseSymptoms.length, MAX_COUNT); i++) {
+            diseaseNames.add(diseaseSymptoms[i].getDisease().getName());
+        }
+
+        List<KGEntity> diseaseList = searchEntities(schema, diseaseNames.toArray(String[]::new));
+        diseaseList.addAll(nonSymptomList);
+
+        return diseaseList;
+    }
+
+    private void addRelationshipsToJoiner(String schema, List<KGEntity> entityList, StringJoiner joiner) {
+        List<KGRelationship> relationships = searchRelationships(schema, entityList);
         for (KGRelationship relationship : relationships) {
             joiner.add(relationship.getDescription());
         }
-        return joiner.toString();
     }
 
     private List<KGSegment> searchSegments(String schema, String input, String[] entities) {
@@ -185,6 +252,10 @@ public class GraphSearch {
 
     private List<KGEntity> searchEntities(String schema, String[] entities) {
         List<KGEntity> entityList = jdbcRepository.getEntities(schema, entities, 6);
+        int maxSize = getMaxEntitySize(schema);
+        if (entityList.size() > maxSize) {
+            return entityList.subList(0, maxSize);
+        }
         return entityList;
     }
 
@@ -193,7 +264,18 @@ public class GraphSearch {
         for (int i = 0; i < entityList.size(); i++) {
             entities[i] = entityList.get(i).getName();
         }
-        List<KGRelationship> relationships = jdbcRepository.getRelationships(schema, entities);
+        KGGraph graph = graphMap.get(schema);
+        List<KGRelationship> relationships = new ArrayList<>();
+        for (String entity : entities) {
+            List<KGRelationship> list = graph.getRelationships(entity);
+            if (list != null && !list.isEmpty()) {
+                relationships.addAll(list);
+            }
+        }
+        int maxSize = getMaxRelationshipSize(schema);
+        if (relationships.size() > maxSize) {
+            return relationships.subList(0, maxSize);
+        }
         return relationships;
     }
 
@@ -258,5 +340,7 @@ public class GraphSearch {
         }
     }
 
-
+    public JdbcRepository getJdbcRepository() {
+        return jdbcRepository;
+    }
 }
