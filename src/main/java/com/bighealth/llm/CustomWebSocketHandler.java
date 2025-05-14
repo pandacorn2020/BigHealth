@@ -97,12 +97,13 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
     public void handleChat(WebSocketSession session, JsonNode jsonNode) {
         String input = jsonNode.get(INPUT).asText();
-        ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(17);
+        ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(8);
         SystemMessage sysMessage = systemMessage(systemPrompt);
         // get json array from json node for HISTORY
         String[] historyMessages = convertJsonArrayToStringArray(jsonNode, HISTORY);
         setHistoryMessages(chatMemory, sysMessage, historyMessages);
         SessionData sessionData = new SessionData();
+        sessionData.setChatMemory(chatMemory);
         MeasureTools measureTools = new MeasureTools(sessionData, graphSearch);
         // cast it as a string array
         Assistant assistant = AiServices.builder(Assistant.class)
