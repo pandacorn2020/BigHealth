@@ -32,6 +32,9 @@ public class JdbcRepository {
             kgEntity.setName(rs.getString("name"));
             kgEntity.setType(rs.getString("type"));
             kgEntity.setDescription(rs.getString("description"));
+            if(kgEntity.getName() == null || kgEntity.getType() == null) {
+                return null;
+            }
             return kgEntity;
         }
     };

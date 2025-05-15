@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.bighealth.llm.*;
 import com.bighealth.service.DocumentLoader;
+import com.bighealth.service.GraphBuilder;
 import com.bighealth.service.GraphSearch;
 import com.wisdomdata.jdbc.CloudConnection;
 import com.wisdomdata.jdbc.CloudStatement;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 import static com.wisdomdata.jdbc.CloudStatement.END_OF_STREAMING_CHAT;
 import static dev.langchain4j.data.message.SystemMessage.systemMessage;
@@ -51,6 +53,7 @@ public class StreamingChatController {
 
     private static CloudConnection conn;
     private static CloudStatement stmt;
+    private static final Logger logger = java.util.logging.Logger.getLogger(StreamingChatController.class.getSimpleName());
 
 
     private static ConcurrentHashMap<String, HashMap<String, Object>> mapUserData = new ConcurrentHashMap<>();
@@ -167,7 +170,7 @@ public class StreamingChatController {
 
             StreamingChatLanguageModel streamingChatModel = llmModel.buildStreamingModel();
 
-            ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(17);
+            ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(8);
             SystemMessage sysMessage = systemMessage(systemPrompt);
 
 //            stmt.execute("use " + userData.get(KEY_SCHEMA) + ";");
@@ -192,7 +195,7 @@ public class StreamingChatController {
                             .onNext(new Consumer<String>() {
                                 @Override
                                 public void accept(String s) {
-                                    System.out.print(s);
+                                    logger.info(s);
                                     if (s.equals(END_OF_STREAMING_CHAT)) {
                                         emitter.complete();
                                     }
