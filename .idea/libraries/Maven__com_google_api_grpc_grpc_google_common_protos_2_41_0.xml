@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Maven: com.google.api.grpc:grpc-google-common-protos:2.41.0" type="java-imported" external-system-id="Maven">
+    <properties groupId="com.google.api.grpc" artifactId="grpc-google-common-protos" version="2.41.0" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/api/grpc/grpc-google-common-protos/2.41.0/grpc-google-common-protos-2.41.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/api/grpc/grpc-google-common-protos/2.41.0/grpc-google-common-protos-2.41.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/api/grpc/grpc-google-common-protos/2.41.0/grpc-google-common-protos-2.41.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

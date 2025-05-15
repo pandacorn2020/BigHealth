@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Maven: org.jgrapht:jgrapht-core:1.5.2" type="java-imported" external-system-id="Maven">
+    <properties groupId="org.jgrapht" artifactId="jgrapht-core" version="1.5.2" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jgrapht/jgrapht-core/1.5.2/jgrapht-core-1.5.2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jgrapht/jgrapht-core/1.5.2/jgrapht-core-1.5.2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jgrapht/jgrapht-core/1.5.2/jgrapht-core-1.5.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Maven: com.microsoft.onnxruntime:onnxruntime:1.17.1" type="java-imported" external-system-id="Maven">
+    <properties groupId="com.microsoft.onnxruntime" artifactId="onnxruntime" version="1.17.1" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/microsoft/onnxruntime/onnxruntime/1.17.1/onnxruntime-1.17.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/microsoft/onnxruntime/onnxruntime/1.17.1/onnxruntime-1.17.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/microsoft/onnxruntime/onnxruntime/1.17.1/onnxruntime-1.17.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

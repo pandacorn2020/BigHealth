@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Maven: com.alibaba:dashscope-sdk-java:2.15.1" type="java-imported" external-system-id="Maven">
+    <properties groupId="com.alibaba" artifactId="dashscope-sdk-java" version="2.15.1" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/alibaba/dashscope-sdk-java/2.15.1/dashscope-sdk-java-2.15.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/alibaba/dashscope-sdk-java/2.15.1/dashscope-sdk-java-2.15.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/alibaba/dashscope-sdk-java/2.15.1/dashscope-sdk-java-2.15.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
