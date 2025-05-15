@@ -90,12 +90,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         if (arrayNode != null && arrayNode.isArray()) {
             for (JsonNode element : arrayNode) {
                 String text = element.asText();
-                byte[] bytes = Base64.getDecoder().decode(text);
-                try {
-                    list.add(new String(bytes, "UTF-8"));
-                } catch (Exception e) {
-                    logger.error("Error decoding message: {}", e.getMessage());
-                }
+                list.add(text);
             }
         }
         return list.toArray(new String[0]);
@@ -228,13 +223,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             if (message instanceof SystemMessage) {
                 continue;
             }
-            try {
-                byte[] bytes = message.toString().getBytes("UTF-8");
-                String s = Base64.getEncoder().encodeToString(bytes);
-                history.add(s);
-            } catch (Exception e) {
-                logger.error("Error encoding message: {}", e.getMessage());
-            }
+            history.add(message.toString());
         }
         return history;
     }
