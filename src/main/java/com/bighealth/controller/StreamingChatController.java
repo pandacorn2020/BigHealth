@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.wisdomdata.jdbc.CloudStatement.END_OF_STREAMING_CHAT;
@@ -142,39 +143,36 @@ public class StreamingChatController {
 
     @GetMapping(value = "/stream-graph-chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter streamGraphChat(@RequestParam String id, @RequestParam String query, @RequestParam String input, HttpSession session) throws SQLException {
-        System.out.println("进来没有？");
         String userId = id;
-        System.out.println("userId:" + userId);
-        System.out.println("inputText:" + input);
-        System.out.println("query:" + query);
+        logger.info("userId:" + userId);
+        logger.info("query:" + query);
+        logger.info("inputText:" + input);
 
 
-        SseEmitter emitter = new SseEmitter(1200000L);  // 设置超时为 60 秒
+        SseEmitter emitter = new SseEmitter(1200000L);  // 设置超时为 1200 秒
         emitter.onTimeout(() -> {
-            System.out.println("超时了！");
+            logger.warning("超时了！");
             emitter.complete();
         });
-
+        long startTime = System.currentTimeMillis();
         try {
 
             if (userId == null || userId.trim().equals("") || input == null || input.trim().equals("") || query == null || query.trim().equals("")) {
                 throw new Exception("userId或inputText或query为空");
             }
             HashMap<String, Object> userData = mapUserData.get(userId);
-            System.out.println(userData);
+            logger.log(Level.INFO, "userData: {0}", new Object[]{userData});
             String[] chatHistory = (String[]) userData.get(KEY_HISTORY);
 
 
             String systemPrompt = documentLoader.readSystemPrompt();
-            String secondaryPrompt = documentLoader.readSecondaryPrompt();
 
             StreamingChatLanguageModel streamingChatModel = llmModel.buildStreamingModel();
 
             ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(8);
             SystemMessage sysMessage = systemMessage(systemPrompt);
 
-//            stmt.execute("use " + userData.get(KEY_SCHEMA) + ";");
-//            GraphSearch graphSearch = new GraphSearch();
+
             // 使用线程池来执行任务，避免每次都创建新的线程
             executorService.submit(() -> {
                 try {
@@ -190,12 +188,14 @@ public class StreamingChatController {
                             .chatMemory(chatMemory)
                             .tools(measureTools)
                             .build();
-
+                    long beginLlmRequestStart = System.currentTimeMillis();
+                    final String[] reportString = {""};
                     assistant.chat(input)
                             .onNext(new Consumer<String>() {
                                 @Override
                                 public void accept(String s) {
                                     logger.info(s);
+                                    reportString[0] += s;
                                     if (s.equals(END_OF_STREAMING_CHAT)) {
                                         emitter.complete();
                                     }
@@ -210,31 +210,37 @@ public class StreamingChatController {
                                 @Override
                                 public void accept(Response<AiMessage> aiMessageResponse) {
 
+
                                     emitter.complete();
 
                                     String[] currentChatHistory = getChatHistory(chatMemory);
                                     userData.put(KEY_HISTORY, currentChatHistory);
                                     userData.put(KEY_INPUT, input);
     //                                        userData.put(KEY_ENTITIES, sessionData.getRagQuery().getEntities());
-                                    System.out.println("history: " + currentChatHistory);
-                                    System.out.println("\n结束了");
+//                                    logger.info("history: " + currentChatHistory);
+                                    logger.info("\n结束了");
+                                    logger.info("问题：" + input);
+                                    logger.info("用户数据：" + userData);
+                                    logger.info("首Token耗时：" + (System.currentTimeMillis() - beginLlmRequestStart) + "ms");
+                                    logger.info("响应耗时：" + (System.currentTimeMillis() - startTime) + "ms");
+                                    logger.info("报告：\n" + reportString[0]);
                                 }
                             })
                             .onError(new Consumer<Throwable>() {
                                 @Override
                                 public void accept(Throwable throwable) {
-                                    System.out.println("发生错误：" + throwable.getMessage());
+                                    logger.warning("发生错误：" + throwable.getMessage());
                                     emitter.complete();
                                 }
                             }).start();
 //                    emitter.complete();  // 完成流式响应
                 } catch (Exception e) {
-                    System.err.println("发生错误：" + e.getMessage());
+                    logger.warning("发生错误：" + e.getMessage());
                     emitter.completeWithError(e);  // 如果发生错误，通知客户端
                 }
             });
         } catch (Exception e) {
-            System.err.println("发生错误：" + e.getMessage());
+            logger.warning("发生错误：" + e.getMessage());
             emitter.completeWithError(e);  // 如果外部异常发生，通知客户端
         }
 
