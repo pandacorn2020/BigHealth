@@ -169,7 +169,7 @@ public class StreamingChatController {
 
             StreamingChatLanguageModel streamingChatModel = llmModel.buildStreamingModel();
 
-            ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(8);
+            ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(10);
             SystemMessage sysMessage = systemMessage(systemPrompt);
 
 
