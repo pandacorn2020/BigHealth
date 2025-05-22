@@ -129,7 +129,7 @@ public class StreamingChatController {
         } else {
             userData = mapUserData.get(userId);
         }
-        userData.put(KEY_HISTORY, new String[0]);
+        userData.put(KEY_HISTORY, new ChatMessage[0]);
         userData.put(KEY_INPUT, "");
         userData.put(KEY_ENTITIES, new String[0]);
         mapUserData.put(userId, userData);
@@ -162,7 +162,7 @@ public class StreamingChatController {
             }
             HashMap<String, Object> userData = mapUserData.get(userId);
             logger.log(Level.INFO, "userData: {0}", new Object[]{userData});
-            String[] chatHistory = (String[]) userData.get(KEY_HISTORY);
+            ChatMessage[] chatHistory = (ChatMessage[]) userData.get(KEY_HISTORY);
 
 
             String systemPrompt = documentLoader.readSystemPrompt();
@@ -178,8 +178,7 @@ public class StreamingChatController {
                 try {
 
                     // get json array from json node for HISTORY
-                    String[] historyMessages = chatHistory;
-                    setHistoryMessages(chatMemory, sysMessage, historyMessages);
+                    setHistoryMessages(chatMemory, sysMessage, chatHistory);
                     SessionData sessionData = new SessionData();
                     MeasureTools measureTools = new MeasureTools(sessionData, graphSearch);
                     // cast it as a string array
@@ -213,7 +212,7 @@ public class StreamingChatController {
 
                                     emitter.complete();
 
-                                    String[] currentChatHistory = getChatHistory(chatMemory);
+                                    ChatMessage[] currentChatHistory = getChatHistory(chatMemory);
                                     userData.put(KEY_HISTORY, currentChatHistory);
                                     userData.put(KEY_INPUT, input);
     //                                        userData.put(KEY_ENTITIES, sessionData.getRagQuery().getEntities());
@@ -249,20 +248,13 @@ public class StreamingChatController {
 
 
     public static void setHistoryMessages(ChatMemory chatMemory,
-                                          SystemMessage systemMessage, String[] messages) {
+                                          SystemMessage systemMessage, ChatMessage[] messages) {
         chatMemory.clear();
         if (systemMessage != null) {
             chatMemory.add(systemMessage);
         }
-        for (int i = 0; i < messages.length; i++) {
-            String message = messages[i].trim();
-            if (message.startsWith("UserMessage")) {
-                chatMemory.add(buildUserMessage(message));
-            } else if (message.startsWith("AiMessage")) {
-                chatMemory.add(buildAiMessage(message));
-            } else if (message.startsWith("ToolExecutionResultMessage")) {
-                chatMemory.add(buildToolExecutionResultMessage(message));
-            }
+        for (ChatMessage message : messages) {
+            chatMemory.add(message);
         }
     }
 
@@ -331,19 +323,22 @@ public class StreamingChatController {
         return str;
     }
 
-    private String[] getChatHistory(ChatMemory chatMemory) {
+    private ChatMessage[] getChatHistory(ChatMemory chatMemory) {
         if (chatMemory == null) {
-            return new String[0];
+            return new ChatMessage[0];
         }
         List<ChatMessage> messages = chatMemory.messages();
-        String[] history = new String[messages.size()];
+        List<ChatMessage> history = new ArrayList();
         // 将messages转换为字符串数组
 
         for (int i = 0; i < messages.size(); i++) {
             ChatMessage message = messages.get(i);
-            history[i] = message.toString();
+            if (message instanceof SystemMessage) {
+                continue;
+            }
+            history.add(message);
         }
-        return history;
+        return history.toArray(new ChatMessage[0]);
     }
 
 
