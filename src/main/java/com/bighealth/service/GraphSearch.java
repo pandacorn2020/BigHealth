@@ -107,7 +107,7 @@ public class GraphSearch {
 
     public String queryForHealthReport(RagQuery query) {
         StringJoiner joiner = new StringJoiner("\n\n",
-                HEALTH_START, HEALTH_END);
+                "生成综合健康分析报告:\n" + HEALTH_START, HEALTH_END);
         String input = query.getQuery();
         String[] entities = query.getEntities();
         if (entities == null || entities.length == 0) {
@@ -156,8 +156,9 @@ public class GraphSearch {
     }
 
     public String queryForAssociatedFactorsReport(RagQuery query) {
+        logger.info("queryForAssociatedFactorsReport: {}", query);
         StringJoiner joiner = new StringJoiner("\n\n",
-                HEALTH_START, HEALTH_END);
+                "生成关联因素的健康报告：\n" +HEALTH_START, HEALTH_END);
         String input = query.getQuery();
         String[] entities = query.getEntities();
         if (entities == null || entities.length == 0) {

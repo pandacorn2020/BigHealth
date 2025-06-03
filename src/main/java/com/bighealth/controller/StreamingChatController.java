@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.bighealth.llm.*;
 import com.bighealth.service.DocumentLoader;
-import com.bighealth.service.GraphBuilder;
 import com.bighealth.service.GraphSearch;
 import com.wisdomdata.jdbc.CloudConnection;
 import com.wisdomdata.jdbc.CloudStatement;
@@ -13,7 +12,6 @@ import dev.langchain4j.agent.tool.ToolExecutionRequest;
 import dev.langchain4j.data.message.*;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import dev.langchain4j.model.StreamingResponseHandler;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.output.Response;
 import dev.langchain4j.service.AiServices;
@@ -23,17 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.springframework.web.socket.WebSocketSession;
 
-import javax.print.Doc;
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,6 +57,8 @@ public class StreamingChatController {
 
     private static String KEY_INPUT = "input";
     private static String KEY_ENTITIES = "entities";
+
+    public static String RAG_QUERY= "ragQuery";
 
 
     public static final String INPUT = "input";
@@ -180,7 +173,9 @@ public class StreamingChatController {
                     // get json array from json node for HISTORY
                     setHistoryMessages(chatMemory, sysMessage, chatHistory);
                     SessionData sessionData = new SessionData();
+                    sessionData.setUserData(userData);
                     MeasureTools measureTools = new MeasureTools(sessionData, graphSearch);
+
                     // cast it as a string array
                     StreamingChatController.Assistant assistant = AiServices.builder(StreamingChatController.Assistant.class)
                             .streamingChatLanguageModel(streamingChatModel)

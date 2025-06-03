@@ -26,7 +26,6 @@ public class MeasureTools {
         logger.info("MeasureTools.queryForMoreSymptoms: {}", arg0);
         String inputText = arg0;
         RagQuery ragQuery = RagQuery.valueOf(arg0);
-        sessionData.setRagQuery(ragQuery);
         String result = graphSearch.queryForMoreSymptoms(ragQuery);
         logger.info("result: {}", result);
         return result;
@@ -38,21 +37,22 @@ public class MeasureTools {
     public String queryForHealthReport(@P("input") String arg0) {
         logger.info("MeasureTools.queryForHealthReport: {}", arg0);
         RagQuery ragQuery = RagQuery.valueOf(arg0);
-        logger.info("RagQuery: {}", ragQuery);
         sessionData.setRagQuery(ragQuery);
+        logger.info("RagQuery: {}", ragQuery);
         String result = graphSearch.queryForHealthReport(ragQuery);
         logger.info("result: {}", result);
         return result;
     }
 
     @Tool("""
-          Use this tool to query for associated factors report with a text as query parameter.  
+          Use this tool to get associated factors report health data, there is no input parameter needed.  
             """)
-    public String queryForAssociatedFactorsReport(@P("input") String arg0) {
-        logger.info("MeasureTools.queryForAssociatedFactorsReport: {}", arg0);
-        RagQuery ragQuery = RagQuery.valueOf(arg0);
+    public String getAssociatedFactorsData() {
+        RagQuery ragQuery = sessionData.getRagQuery();
+        if (ragQuery == null) {
+            return "No associated factors report available. Please provide a valid query.";
+        }
         logger.info("RagQuery: {}", ragQuery);
-        sessionData.setRagQuery(ragQuery);
         String result = graphSearch.queryForAssociatedFactorsReport(ragQuery);
         logger.info("result: {}", result);
         return result;
@@ -66,7 +66,6 @@ public class MeasureTools {
         String inputText = arg0;
         RagQuery ragQuery = RagQuery.valueOf(arg0);
         logger.info("RagQuery: {}", inputText, ragQuery);
-        sessionData.setRagQuery(ragQuery);
         String result = graphSearch.queryForDrugInfo(ragQuery);
         logger.info("result: {}", result);
         return result;
@@ -75,11 +74,10 @@ public class MeasureTools {
     @Tool("""
           Use this tool to query for general health info with a text as query parameter.  
             """)
-    public String queryForGeneralHealthInfo(@P("input") String arg0) {
+    public String queryGeneralHealthInfo(@P("input") String arg0) {
         logger.info("MeasureTools.queryForGeneralHealthInfo: {}", arg0);
         RagQuery ragQuery = RagQuery.valueOf(arg0);
         logger.info("RagQuery: {}", ragQuery);
-        sessionData.setRagQuery(ragQuery);
         String result = graphSearch.queryForGeneralHealthInfo(ragQuery);
         logger.info("result: {}", result);
         return result;
