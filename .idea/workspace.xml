@@ -4,7 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a06e19a3-ef71-48bd-8ed1-c7a71c5b1357" name="Changes" comment="" />
+    <list default="true" id="a06e19a3-ef71-48bd-8ed1-c7a71c5b1357" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/health_system_prompt_zh_old.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/营养医学篇/维生素缺乏症.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/resources/指南共识篇1/1.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bighealth/llm/MeasureTools.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bighealth/llm/MeasureTools.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bighealth/llm/RagQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bighealth/llm/RagQuery.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bighealth/service/GraphBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bighealth/service/GraphBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bighealth/service/GraphSearch.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bighealth/service/GraphSearch.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bighealth/util/FileConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bighealth/util/FileConverter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/health_system_prompt_zh.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/health_system_prompt_zh.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/bighealth/service/DocumentLoaderTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bighealth/service/DocumentLoaderTest.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -37,15 +53,28 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.BigHealthApplication.executor": "Run",
+    "Application.DataApiClient.executor": "Run",
+    "Application.FileConverter.executor": "Run",
     "Application.WebSocketCommandLineTool.executor": "Run",
+    "JUnit.DocumentLoaderTest.testPath.executor": "Debug",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/13025/Documents/NetBeansProjects/BigHealth"
+    "last_opened_file_path": "C:/Users/13025/Documents/NetBeansProjects/BigHealth/src/main/resources/营养医学篇",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "reference.projectsettings.compiler.annotationProcessors"
   }
 }]]></component>
-  <component name="RunManager" selected="Application.WebSocketCommandLineTool">
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\13025\Documents\NetBeansProjects\BigHealth\src\main\resources\营养医学篇" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.BigHealthApplication">
     <configuration name="BigHealthApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.bighealth.BigHealthApplication" />
       <module name="BigHealth" />
@@ -53,6 +82,34 @@
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="com.bighealth.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DataApiClient" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.bighealth.client.DataApiClient" />
+      <module name="BigHealth" />
+      <shortenClasspath name="ARGS_FILE" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.bighealth.client.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="FileConverter" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.bighealth.util.FileConverter" />
+      <module name="BigHealth" />
+      <shortenClasspath name="ARGS_FILE" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.bighealth.util.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -80,10 +137,37 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="DocumentLoaderTest.testPath" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="BigHealth" />
+      <shortenClasspath name="ARGS_FILE" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.bighealth.service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.bighealth.service" />
+      <option name="MAIN_CLASS_NAME" value="com.bighealth.service.DocumentLoaderTest" />
+      <option name="METHOD_NAME" value="testPath" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <shortenClasspath name="ARGS_FILE" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.WebSocketCommandLineTool" />
         <item itemvalue="Application.BigHealthApplication" />
+        <item itemvalue="Application.DataApiClient" />
+        <item itemvalue="JUnit.DocumentLoaderTest.testPath" />
+        <item itemvalue="Application.FileConverter" />
+        <item itemvalue="Application.WebSocketCommandLineTool" />
       </list>
     </recent_temporary>
   </component>
@@ -121,7 +205,72 @@
           <line>88</line>
           <option name="timeStamp" value="34" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/bighealth/service/GraphSearch.java</url>
+          <line>486</line>
+          <option name="timeStamp" value="39" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/bighealth/service/GraphSearch.java</url>
+          <line>483</line>
+          <option name="timeStamp" value="40" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/bighealth/service/GraphSearch.java</url>
+          <line>478</line>
+          <option name="timeStamp" value="41" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/com/bighealth/service/DocumentLoaderTest.java</url>
+          <line>39</line>
+          <option name="timeStamp" value="42" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/bighealth/llm/MeasureTools.java</url>
+          <line>25</line>
+          <option name="timeStamp" value="44" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/bighealth/llm/MeasureTools.java</url>
+          <line>38</line>
+          <option name="timeStamp" value="45" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/bighealth/llm/MeasureTools.java</url>
+          <line>51</line>
+          <option name="timeStamp" value="46" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/bighealth/llm/MeasureTools.java</url>
+          <line>64</line>
+          <option name="timeStamp" value="47" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/bighealth/llm/MeasureTools.java</url>
+          <line>78</line>
+          <option name="timeStamp" value="48" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/bighealth/llm/MeasureTools.java</url>
+          <line>31</line>
+          <option name="timeStamp" value="49" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/bighealth/llm/MeasureTools.java</url>
+          <line>44</line>
+          <option name="timeStamp" value="50" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/bighealth/service/GraphSearch.java</url>
+          <line>154</line>
+          <option name="timeStamp" value="53" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="entityList.get(10)" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

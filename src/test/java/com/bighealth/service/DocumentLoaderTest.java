@@ -3,6 +3,8 @@ package com.bighealth.service;
 import com.bighealth.util.FileConverter;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
+
 public class DocumentLoaderTest {
 
     @Test
@@ -32,6 +34,11 @@ public class DocumentLoaderTest {
 
 
 
+    @Test
+    public void testPath() throws Exception {
+        Path path = FileConverter.getResourcePath("指南共识篇1");
+        System.out.println("path = " + path);
+    }
 
 
 }

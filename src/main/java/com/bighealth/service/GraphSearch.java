@@ -3,8 +3,11 @@ package com.bighealth.service;
 import com.bighealth.entity.*;
 import com.bighealth.llm.LLMModel;
 import com.bighealth.llm.RagQuery;
+import com.bighealth.llm.SessionData;
 import com.bighealth.repository.*;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,9 @@ import java.util.*;
 @Service
 public class GraphSearch {
     public static final int MAX_COUNT = 32;
+    public static final String HEALTH_START = "\n<健康数据>\n";
+    public static final String HEALTH_END = "\n</健康数据>\n";
+    private static final Logger logger = LoggerFactory.getLogger(GraphSearch.class.getSimpleName());
 
     @Autowired
     private JdbcRepository jdbcRepository;
@@ -20,15 +26,22 @@ public class GraphSearch {
     @Autowired
     private LLMModel llmModel;
 
-    public static final int RELATIONSHIP_MAX_SIZE = 80;
-    public static final int DOC_SEGMENT_MAX_SIZE = 8;
+    public static final int RELATIONSHIP_MAX_SIZE = 32;
+    public static final int DOC_SEGMENT_MAX_SIZE = 6;
 
-    public static final int ENTITY_MAX_SIZE = 40;
+    public static final int ENTITY_MAX_SIZE = 24;
 
     private Map<String, KGGraph> graphMap = new HashMap<>();
 
+    private SessionData sessionData;
+
+
     public GraphSearch() {
 
+    }
+
+    public void setSessionData(SessionData sessionData) {
+        this.sessionData = sessionData;
     }
 
     @PostConstruct
@@ -70,22 +83,249 @@ public class GraphSearch {
 
     public String search(RagQuery query) {
         StringJoiner joiner = new StringJoiner("\n\n",
-                "\n<健康数据>\n", "\n</健康数据>\n");
+                HEALTH_START, HEALTH_END);
         String input = query.getQuery();
         String[] entities = query.getEntities();
         for (String schema : Schemas.SCHEMAS) {
             String result = search(schema, input, entities);
             joiner.add(result);
         }
-        /*
-        Arrays.stream(Schemas.SCHEMAS)
-                .parallel()
-                .map(schema -> search(schema, input, entities))
-                .filter(result -> result != null && !result.isEmpty())
-                .forEach(joiner::add);
-
-         */
         return joiner.toString();
+    }
+
+    public String queryForMoreSymptoms(RagQuery query) {
+        StringJoiner joiner = new StringJoiner("\n\n",
+                HEALTH_START, HEALTH_END);
+        String input = query.getQuery();
+        String[] entities = query.getEntities();
+        String ebmResut = queryForMoreSymptoms(Schemas.EBM, input, entities);
+        joiner.add(ebmResut);
+        String tcmResult = queryForMoreSymptoms(Schemas.TCM, input, entities);
+        joiner.add(tcmResult);
+        return joiner.toString();
+    }
+
+    public String queryForHealthReport(RagQuery query) {
+        StringJoiner joiner = new StringJoiner("\n\n",
+                HEALTH_START, HEALTH_END);
+        String input = query.getQuery();
+        String[] entities = query.getEntities();
+        if (entities == null || entities.length == 0) {
+            return joiner.toString();
+        }
+
+        // EBM 西医
+        String schema = Schemas.EBM;
+        StringJoiner ebmJoiner = initializeSchemaJoiner(schema);
+        addSegmentsToJoiner(schema, input, entities, ebmJoiner);// Default schema for health report
+        List<String> ebmDiseases = queryForDiseases(schema, query);
+        logger.info("西医: diseases={}", ebmDiseases);
+        String healthReport = queryForHealthReport(schema, query, ebmDiseases.toArray(String[]::new));
+        ebmJoiner.add(healthReport);
+        joiner.add(ebmJoiner.toString());
+
+        // TCM 中医
+        schema = Schemas.TCM; // TCM schema for health report
+        StringJoiner tcmJoiner = initializeSchemaJoiner(schema);
+        addSegmentsToJoiner(schema, input, entities, tcmJoiner);
+        List<String> tcmDiseases = queryForDiseases(schema, query);
+        logger.info("中医: diseases={}", tcmDiseases);
+        healthReport = queryForHealthReport(schema, query, tcmDiseases.toArray(String[]::new));
+        tcmJoiner.add(healthReport);
+        joiner.add(tcmJoiner.toString());
+
+        ebmDiseases.addAll(tcmDiseases);
+
+        // NUTR 营养
+        schema = Schemas.NUTR;
+        StringJoiner nutrJoiner = initializeSchemaJoiner(schema);
+        addSegmentsToJoiner(schema, input, entities, nutrJoiner);
+        healthReport = queryForHealthReport(schema, query, ebmDiseases.toArray(String[]::new));
+        nutrJoiner.add(healthReport);
+        joiner.add(nutrJoiner.toString());
+
+        // CPM 中成药
+        schema = Schemas.CPM;
+        StringJoiner cpmJoiner = initializeSchemaJoiner(schema);
+        addSegmentsToJoiner(schema, input, entities, cpmJoiner);
+        healthReport = queryForHealthReport(schema, query, ebmDiseases.toArray(String[]::new));
+        cpmJoiner.add(healthReport);
+        joiner.add(cpmJoiner.toString());
+
+        return joiner.toString();
+    }
+
+    public String queryForAssociatedFactorsReport(RagQuery query) {
+        StringJoiner joiner = new StringJoiner("\n\n",
+                HEALTH_START, HEALTH_END);
+        String input = query.getQuery();
+        String[] entities = query.getEntities();
+        if (entities == null || entities.length == 0) {
+            return joiner.toString();
+        }
+
+        // TCM 中医
+        String schema = Schemas.TCM; // TCM schema for health report
+        List<String> diseases = queryForDiseases(schema, query);
+
+        // NUTR 营养
+        schema = Schemas.NUTR;
+        StringJoiner schemaJoiner = initializeSchemaJoiner(schema);
+        addSegmentsToJoiner(schema, input, entities, schemaJoiner);
+        String healthReport = queryForHealthReport(schema, query, diseases.toArray(String[]::new));
+        schemaJoiner.add(healthReport);
+        joiner.add(schemaJoiner.toString());
+
+        // IMMU 免疫
+        schema = Schemas.IMM;
+        schemaJoiner = initializeSchemaJoiner(schema);
+        addSegmentsToJoiner(schema, input, entities, schemaJoiner);
+        healthReport = queryForHealthReport(schema, query, diseases.toArray(String[]::new));
+        schemaJoiner.add(healthReport);
+        joiner.add(schemaJoiner.toString());
+
+        // ORG 组织器官
+        schema = Schemas.ORGAN;
+        schemaJoiner = initializeSchemaJoiner(schema);
+        addSegmentsToJoiner(schema, input, entities, schemaJoiner);
+        healthReport = queryForHealthReport(schema, query, diseases.toArray(String[]::new));
+        schemaJoiner.add(healthReport);
+        joiner.add(schemaJoiner.toString());
+
+        // aging
+        schema = Schemas.AGING;
+        schemaJoiner = initializeSchemaJoiner(schema);
+        addSegmentsToJoiner(schema, input, entities, schemaJoiner);
+        healthReport = queryForHealthReport(schema, query, diseases.toArray(String[]::new));
+        schemaJoiner.add(healthReport);
+        joiner.add(schemaJoiner.toString());
+
+        return joiner.toString();
+    }
+
+    public String queryForDrugInfo(RagQuery query) {
+        StringJoiner joiner = new StringJoiner("\n\n",
+                HEALTH_START, HEALTH_END);
+        String input = query.getQuery();
+        String[] entities = query.getEntities();
+        if (entities == null || entities.length == 0) {
+            return joiner.toString();
+        }
+
+        // CPM 中成药
+        String schema = Schemas.CPM;
+        addSegmentsToJoiner(schema, input, entities, joiner);
+        List<KGEntity> entityList = searchEntities(schema, entities);
+        if (!entityList.isEmpty()) {
+            joiner.add(buildEntitiesContent(entityList));
+        }
+        return joiner.toString();
+    }
+
+    public String queryForGeneralHealthInfo(RagQuery query) {
+        StringJoiner joiner = new StringJoiner("\n\n",
+                HEALTH_START, HEALTH_END);
+        String input = query.getQuery();
+        String[] entities = query.getEntities();
+        if (entities == null || entities.length == 0) {
+            return joiner.toString();
+        }
+        for (String schema : Schemas.SCHEMAS) {
+            StringJoiner schemaJoiner = initializeSchemaJoiner(schema);
+            addSegmentsToJoiner(schema, input, entities, schemaJoiner);
+            List<KGEntity> entityList = searchEntities(schema, entities);
+            if (!entityList.isEmpty()) {
+                schemaJoiner.add(buildEntitiesContent(entityList));
+            }
+            joiner.add(schemaJoiner.toString());
+        }
+        return joiner.toString();
+    }
+
+
+    private String queryForMoreSymptoms(String schema, String input, String[] entities) {
+        StringJoiner joiner = initializeSchemaJoiner(schema);
+        List<KGEntity> entityList = searchEntities(schema, entities);
+        if (entityList.isEmpty()) {
+            return joiner.toString();
+        }
+        List<KGRelationship> relationships = searchRelationships(schema, entityList);
+        if (relationships.isEmpty()) {
+            return joiner.toString();
+        }
+        KGGraph graph = graphMap.get(schema);
+        for (KGRelationship relationship : relationships) {
+            String source = relationship.getSource();
+            KGEntity entity = graph.getEntityById(source);
+            if (isDisease(entity)) {
+                // If the source is a disease, we can add more symptoms
+                String description = relationship.getDescription();
+                joiner.add(description);
+                continue;
+            }
+            String target = relationship.getTarget();
+            entity = graph.getEntityById(target);
+            if (isDisease(entity)) {
+                // If the source is a disease, we can add more symptoms
+                String description = relationship.getDescription();
+                joiner.add(description);
+            }
+        }
+        return joiner.toString();
+    }
+
+
+    private List<String> queryForDiseases(String schema, RagQuery query) {
+        String input = query.getQuery();
+        String[] entities = query.getEntities();
+        List<KGEntity> entityList = searchEntities(schema, entities);
+        if (entityList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<KGRelationship> relationships = searchRelationships(schema, entityList);
+        if (relationships.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Map<String, DiseaseSymptoms> map = buildDiseaseSymptomsMap(schema, relationships);
+        DiseaseSymptoms[] diseaseSymptoms = map.values().toArray(DiseaseSymptoms[]::new);
+        Arrays.sort(diseaseSymptoms);
+        List<String> diseaseNames = new ArrayList<>();
+        for (int i = 0; i < Math.min(diseaseSymptoms.length, 3); i++) {
+            diseaseNames.add(diseaseSymptoms[i].getDisease().getName());
+        }
+        return diseaseNames;
+    }
+
+    private String queryForHealthReport(String schema, RagQuery query, String[] diseases) {
+        StringJoiner joiner = new StringJoiner("\n");
+        String input = query.getQuery();
+        String[] entities = query.getEntities();
+        List<KGEntity> entityList = searchEntities(schema, entities);
+        List<KGEntity> diseaseEntities = searchEntities(schema, diseases);
+        if (!diseaseEntities.isEmpty()) {
+            entityList.addAll(diseaseEntities);
+        }
+        if (entityList.isEmpty()) {
+            return joiner.toString();
+        }
+        List<KGRelationship> relationships = searchRelationships(schema, entityList);
+        if (relationships.isEmpty()) {
+            return joiner.toString();
+        }
+        for (KGRelationship relationship : relationships) {
+           joiner.add(relationship.getDescription());
+        }
+        return joiner.toString();
+    }
+
+
+
+    private boolean isDisease(KGEntity entity) {
+        if (entity == null) {
+            return false;
+        }
+        String type = entity.getType();
+        return isDisease(type);
     }
 
 
@@ -94,8 +334,7 @@ public class GraphSearch {
     }
 
     private String searchComplete(String schema, String input, String[] entities) {
-        String schemaDescription = Schemas.getSchemaDescription(schema);
-        StringJoiner joiner = initializeSchemaJoiner(schemaDescription);
+        StringJoiner joiner = initializeSchemaJoiner(schema);
 
         addSegmentsToJoiner(schema, input, entities, joiner);
         addCommunitiesToJoiner(schema, input, entities, joiner);
@@ -110,7 +349,8 @@ public class GraphSearch {
         return joiner.toString();
     }
 
-    private StringJoiner initializeSchemaJoiner(String schemaDescription) {
+    private StringJoiner initializeSchemaJoiner(String schema) {
+        String schemaDescription = Schemas.getSchemaDescription(schema);
         return new StringJoiner("\n",
                 "\n" + schemaDescription + ":\n" + String.format("<%s>\n", schemaDescription),
                 String.format("\n</%s>\n", schemaDescription));
@@ -199,6 +439,21 @@ public class GraphSearch {
         } else if (isSymptomRelationship(relationship.getRelation())) {
             nonSymptomList.add(entity);
         }
+    }
+
+    private Map<String, DiseaseSymptoms> buildDiseaseSymptomsMap(String schema, List<KGRelationship> relationships) {
+        Map<String, DiseaseSymptoms> map = new HashMap<>();
+        for (KGRelationship relationship : relationships) {
+            String source = relationship.getSource();
+            KGEntity entity = graphMap.get(schema).getEntityById(source);
+            if (entity == null) {
+                continue;
+            }
+            if (isDisease(entity.getType())) {
+                map.computeIfAbsent(entity.getName(), r -> new DiseaseSymptoms(entity)).add(relationship);
+            }
+        }
+        return map;
     }
 
     private boolean isDisease(String type) {

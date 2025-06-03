@@ -13,6 +13,8 @@ import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,12 +24,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 @Service
 public class GraphBuilder {
-    private static final Logger logger = java.util.logging.Logger.getLogger(GraphBuilder.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(GraphBuilder.class.getSimpleName());
 
     private final LLMModel llmModel;
     private final DocumentLoader documentLoader;
@@ -82,7 +83,7 @@ public class GraphBuilder {
 
     @Transactional
     public void buildGraph(String schema) {
-        logger.log(Level.INFO, "Building knowledge graph for schema: {0}", schema);
+        logger.info("Building knowledge graph for schema: {}", schema);
         switch (schema) {
             case Schemas.CPM -> {
                 buildCPMGraph();
@@ -106,7 +107,7 @@ public class GraphBuilder {
 
 
     private void buildGraph(String schemaName, List<String> slices, String description) {
-        logger.log(Level.INFO, "Building knowledge graph for schema: {0}, description: {1}", new Object[]{schemaName, description});
+        logger.info("Building knowledge graph for schema: {}, description: {}", schemaName, description);
         KGGraph graph = new KGGraph(schemaName);
         // add slices to segments
         for (String slice : slices) {
@@ -122,8 +123,8 @@ public class GraphBuilder {
                     TextSegment.from(slice), model));
             if (taskList.size() >= batchSize) {
                 size += taskList.size();
-                logger.log(Level.INFO, "Processing batch of size: {0}, {1}/{2}",
-                        new Object[] {taskList.size(), size, slices.size()});
+                logger.info("Processing batch of size: {}, {}/{}",
+                        taskList.size(), size, slices.size());
                 List<String> textList = batchGetKgText(taskList);
                 for (String text : textList) {
                     updateKnowledgeGraph(graph, text);
@@ -133,20 +134,20 @@ public class GraphBuilder {
             }
         }
         if (!taskList.isEmpty()) {
-            logger.log(Level.INFO, "Processing batch of size: {0}, {1}/{2}",
-                    new Object[] {taskList.size(), size, slices.size()});
+            logger.info("Processing batch of size: {}, {}/{}",
+                    taskList.size(), size, slices.size());
             List<String> textList = batchGetKgText(taskList);
             for (String text : textList) {
                 updateKnowledgeGraph(graph, text);
             }
         }
-        logger.log(Level.INFO, "Building communities for schema: {0}, size: {1}",
-                new Object[] {schemaName, graph.entitySize()});
+        logger.info("Building communities for schema: {}, size: {}",
+                schemaName, graph.entitySize());
         graph.buildCommunities(this);
         graph.save(this);
         jdbcRepository.saveKGFile(schemaName, description);
-        logger.log(Level.INFO, "Finished building knowledge graph for: {0}/{1}",
-                new Object[] {schemaName, description});
+        logger.info("Finished building knowledge graph for: {}/{}",
+                schemaName, description);
     }
 
     private void buildCPMGraph() {
@@ -164,7 +165,7 @@ public class GraphBuilder {
             graph.save(this);
             jdbcRepository.saveKGFile(Schemas.CPM, description);
         } catch (Throwable t) {
-            logger.log(Level.SEVERE, "Failed to build CPM graph", t);
+            logger.error("Failed to build CPM graph", t);
         }
     }
 
@@ -201,7 +202,7 @@ public class GraphBuilder {
             Path path = FileConverter.getResourcePath(directoryName);
             buildGraph(schemaName, path);
         } catch (Throwable t) {
-            logger.log(Level.SEVERE, "Failed to build EBM graph", t);
+            logger.error("Failed to build graph for " + schemaName, t);
         }
     }
 
@@ -210,34 +211,34 @@ public class GraphBuilder {
             try {
                 Files.list(path).forEach(p -> buildGraph(schema, p));
             } catch (Throwable t) {
-                logger.log(Level.SEVERE, "Failed to build graph", t);
+                logger.error("Failed to build graph", t);
             }
         } else {
             try {
                 String description = path.getFileName().toString();
                 String existFile = jdbcRepository.findKGFileByName(schema, description);
                 if (existFile != null) {
-                    logger.log(Level.INFO, "File already ingested: {0}", description);
+                    logger.info("File already ingested: {}", description);
                     return;
                 }
-                logger.log(Level.INFO, "Processing file: {0}", description);
+                logger.info("Processing file: {}", description);
                 String text = FileConverter.convertFileToText(Files.newInputStream(path),
                         description);
                 boolean direct = description.startsWith("slice") && description.endsWith(".txt")
                         || description.endsWith(".json");
                 if (direct) {
-                    logger.log(Level.INFO, "Directly ingesting file: {0}", description);
+                    logger.info("Directly ingesting file: {}", description);
                     ingestSlices(schema, Collections.singletonList(text), description);
                 } else {
                     // slip into chunks with overlap
                     String[] texts = documentLoader.splitText(text);
-                    logger.log(Level.INFO, "Splitting file into {0} chunks, file size: {1}",
-                            new Object[] {texts.length, text.length()});
+                    logger.info("Splitting file into {} chunks, file size: {}",
+                            texts.length, text.length());
                     ingestSlices(schema, Arrays.asList(texts), description);
                 }
 
             } catch (Throwable t) {
-                logger.log(Level.SEVERE, "Failed to build graph", t);
+                logger.error("Failed to build graph", t);
             }
         }
     }
@@ -269,7 +270,7 @@ public class GraphBuilder {
                 textList.add(slice);
             }
         } else {
-            logger.log(Level.INFO, "Ingesting json file: {0}", description);
+            logger.error("Ingesting json file: {}", description);
             for (String slice : slices) {
                 String[] jsonElements = JsonArrayToStringArray.convert(slice);
                 for (String s : jsonElements) {
@@ -290,19 +291,19 @@ public class GraphBuilder {
             if (text == null) {
                 return;
             }
-            logger.log(Level.INFO, "Updating knowledge graph with text: {0}", text);
+            logger.info("Updating knowledge graph with text: {}", text);
             List<String[]> entities = getRecords(text, ENTITIES_START, ENTITIES_END);
             if (entities != null && !entities.isEmpty()) {
-                logger.log(Level.INFO, "Found {0} entities", entities.size());
+                logger.info("Found {} entities", entities.size());
                 graph.addEntities(entities);
             }
             List<String[]> relationships = getRecords(text, RELATIONSHIP_START, RELATIONSHIP_END);
             if (relationships != null && !relationships.isEmpty()) {
-                logger.log(Level.INFO, "Found {0} relationships", relationships.size());
+                logger.info("Found {} relationships", relationships.size());
                 graph.addRelationships(relationships);
             }
         } catch (Throwable t) {
-            logger.log(Level.SEVERE, "Failed to update knowledge graph", t);
+            logger.error("Failed to update knowledge graph", t);
             t.printStackTrace();
         }
     }
@@ -347,8 +348,8 @@ public class GraphBuilder {
             for (Future<String> future : futureList) {
                 textList.add(future.get());
             }
-            logger.log(Level.INFO, "Batch get kg text, task size: {0}, time: {1}ms",
-                    new Object[]{taskList.size(), watch.elapsed(TimeUnit.MILLISECONDS)});
+            logger.info("Batch get kg text, task size: {}, time: {}ms",
+                    taskList.size(), watch.elapsed(TimeUnit.MILLISECONDS));
             return textList;
         } catch (Throwable t) {
             throw new RuntimeException(t);
@@ -368,8 +369,8 @@ public class GraphBuilder {
                         future.get();
                     }
                     index += futureList.size();
-                    logger.log(Level.INFO, "Batch execute tasks, task size: {0}/{1}, time: {2}ms",
-                            new Object[]{index, taskList.size(), watch.elapsed(TimeUnit.MILLISECONDS)});
+                    logger.info("Batch execute tasks, task size: {}/{}, time: {}ms",
+                            index, taskList.size(), watch.elapsed(TimeUnit.MILLISECONDS));
                     futureList.clear();
                 }
             }
@@ -379,8 +380,8 @@ public class GraphBuilder {
                     future.get();
                 }
                 index += futureList.size();
-                logger.log(Level.INFO, "Batch execute tasks, task size: {0}/{1}, time: {2}ms",
-                        new Object[]{index, taskList.size(), watch.elapsed(TimeUnit.MILLISECONDS)});
+                logger.info("Batch execute tasks, task size: {}/{}, time: {}ms",
+                        index, taskList.size(), watch.elapsed(TimeUnit.MILLISECONDS));
             }
         } catch (Throwable t) {
             throw new RuntimeException(t);

@@ -6,7 +6,6 @@ import dev.langchain4j.agent.tool.Tool;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
-import java.util.StringTokenizer;
 
 public class MeasureTools {
     private GraphSearch graphSearch;
@@ -21,30 +20,69 @@ public class MeasureTools {
 
 
     @Tool("""
-          Use this tool to query back end system with a text as query parameter.  
+          Use this tool to query for more symptoms with a text as query parameter.  
             """)
-    public String query(@P("input") String arg0) {
-        logger.info("MeasureTools.query: {}", arg0);
+    public String queryForMoreSymptoms(@P("input") String arg0) {
+        logger.info("MeasureTools.queryForMoreSymptoms: {}", arg0);
         String inputText = arg0;
-        String[] entities = null;
-        if (arg0.contains("|")) {
-            int index = arg0.indexOf("|");
-            inputText = arg0.substring(0, index);
-            String s1 = arg0.substring(index + 1);
-            StringTokenizer stz = new StringTokenizer(s1, ",");
-            int count = stz.countTokens();
-            entities = new String[count];
-            for (int i = 0; i < count; i++) {
-                entities[i] = stz.nextToken();
-            }
-        }
-        RagQuery ragQuery = new RagQuery();
-        ragQuery.setQuery(inputText);
-        ragQuery.setEntities(entities);
-        logger.info("inputText: {}, entities: {}", inputText, Arrays.asList(entities));
+        RagQuery ragQuery = RagQuery.valueOf(arg0);
         sessionData.setRagQuery(ragQuery);
-        String result = graphSearch.search(ragQuery);
+        String result = graphSearch.queryForMoreSymptoms(ragQuery);
         logger.info("result: {}", result);
         return result;
     }
+
+    @Tool("""
+          Use this tool to query for health report with a text as query parameter.  
+            """)
+    public String queryForHealthReport(@P("input") String arg0) {
+        logger.info("MeasureTools.queryForHealthReport: {}", arg0);
+        RagQuery ragQuery = RagQuery.valueOf(arg0);
+        logger.info("RagQuery: {}", ragQuery);
+        sessionData.setRagQuery(ragQuery);
+        String result = graphSearch.queryForHealthReport(ragQuery);
+        logger.info("result: {}", result);
+        return result;
+    }
+
+    @Tool("""
+          Use this tool to query for associated factors report with a text as query parameter.  
+            """)
+    public String queryForAssociatedFactorsReport(@P("input") String arg0) {
+        logger.info("MeasureTools.queryForAssociatedFactorsReport: {}", arg0);
+        RagQuery ragQuery = RagQuery.valueOf(arg0);
+        logger.info("RagQuery: {}", ragQuery);
+        sessionData.setRagQuery(ragQuery);
+        String result = graphSearch.queryForAssociatedFactorsReport(ragQuery);
+        logger.info("result: {}", result);
+        return result;
+    }
+
+    @Tool("""
+          Use this tool to query for drug info with a text as query parameter.  
+            """)
+    public String queryForDrugInfo(@P("input") String arg0) {
+        logger.info("MeasureTools.queryForDrugInfo: {}", arg0);
+        String inputText = arg0;
+        RagQuery ragQuery = RagQuery.valueOf(arg0);
+        logger.info("RagQuery: {}", inputText, ragQuery);
+        sessionData.setRagQuery(ragQuery);
+        String result = graphSearch.queryForDrugInfo(ragQuery);
+        logger.info("result: {}", result);
+        return result;
+    }
+
+    @Tool("""
+          Use this tool to query for general health info with a text as query parameter.  
+            """)
+    public String queryForGeneralHealthInfo(@P("input") String arg0) {
+        logger.info("MeasureTools.queryForGeneralHealthInfo: {}", arg0);
+        RagQuery ragQuery = RagQuery.valueOf(arg0);
+        logger.info("RagQuery: {}", ragQuery);
+        sessionData.setRagQuery(ragQuery);
+        String result = graphSearch.queryForGeneralHealthInfo(ragQuery);
+        logger.info("result: {}", result);
+        return result;
+    }
+
 }
