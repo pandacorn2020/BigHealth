@@ -10,7 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Repository
@@ -136,8 +138,27 @@ public class JdbcRepository {
     // Method to get entities
     public List<KGEntity> getEntities(String schema, String[] es, int topCount) {
         List<KGEntity> entities = new ArrayList<>();
-        for (String e : es) {
-            entities.addAll(semanticSearchForEntities(schema, e, topCount));
+        List<KGEntity>[] list = new List[es.length];
+        for (int i = 0; i < es.length; i++) {
+            list[i] = semanticSearchForEntities(schema, es[i], topCount);
+        }
+        int size = list[0].size();
+        for (int i = 1; i < list.length; i++) {
+            size = Math.min(size, list[i].size());
+        }
+        Set<String> nameSet = new HashSet<>();
+        for (int i = 0; i < size; i++) {
+            for (List<KGEntity> kgEntities : list) {
+                if (kgEntities.isEmpty()) {
+                    continue;
+                }
+                KGEntity entity = kgEntities.remove(0);
+                if (nameSet.contains(entity.getName())) {
+                    continue;
+                }
+                nameSet.add(entity.getName());
+                entities.add(entity);
+            }
         }
         return entities;
     }
