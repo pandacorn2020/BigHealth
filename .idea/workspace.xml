@@ -6,11 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="a06e19a3-ef71-48bd-8ed1-c7a71c5b1357" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bighealth/controller/StreamingChatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bighealth/controller/StreamingChatController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bighealth/llm/MeasureTools.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bighealth/llm/MeasureTools.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bighealth/llm/SessionData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bighealth/llm/SessionData.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bighealth/service/GraphSearch.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bighealth/service/GraphSearch.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/health_system_prompt_zh.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/health_system_prompt_zh.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,7 +39,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Application.BigHealthApplication.executor": "Debug",
+    "Application.BigHealthApplication.executor": "Run",
     "Application.DataApiClient.executor": "Run",
     "Application.FileConverter.executor": "Run",
     "Application.WebSocketCommandLineTool.executor": "Run",
