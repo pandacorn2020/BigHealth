@@ -26,10 +26,10 @@ public class GraphSearch {
     @Autowired
     private LLMModel llmModel;
 
-    public static final int RELATIONSHIP_MAX_SIZE = 32;
+    public static final int RELATIONSHIP_MAX_SIZE = 64;
     public static final int DOC_SEGMENT_MAX_SIZE = 1;
 
-    public static final int ENTITY_MAX_SIZE = 24;
+    public static final int ENTITY_MAX_SIZE = 32;
 
     private Map<String, KGGraph> graphMap = new HashMap<>();
 
@@ -80,6 +80,15 @@ public class GraphSearch {
         return ENTITY_MAX_SIZE;
     }
 
+    public int getMaxSegmentSize(String schema) {
+        switch (schema) {
+            case Schemas.CPM:
+                return 5;
+            default:
+                break;
+        }
+        return DOC_SEGMENT_MAX_SIZE;
+    }
 
     public String search(RagQuery query) {
         StringJoiner joiner = new StringJoiner("\n\n",
@@ -503,8 +512,9 @@ public class GraphSearch {
     }
 
     private List<KGSegment> searchSegments(String schema, String input, String[] entities) {
+        int maxSize = getMaxSegmentSize(schema);
         List<KGSegment> segments = jdbcRepository.semanticSearchForSegments(schema, input,
-                DOC_SEGMENT_MAX_SIZE);
+                maxSize);
         return segments;
     }
     private List<KGCommunity> searchCommunities(String schema, String input, String[] entities) {
