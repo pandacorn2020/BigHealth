@@ -117,7 +117,8 @@ public class GraphSearch {
         // EBM 西医
         String schema = Schemas.EBM;
         StringJoiner ebmJoiner = initializeSchemaJoiner(schema);
-        addSegmentsToJoiner(schema, input, entities, ebmJoiner);// Default schema for health report
+        addSegmentsToJoiner(schema, input, entities, ebmJoiner);
+        addCommunitiesToJoiner(schema, input, entities, ebmJoiner);// Default schema for health report
         List<String> ebmDiseases = queryForDiseases(schema, query);
         logger.info("西医: diseases={}", ebmDiseases);
         String healthReport = queryForHealthReport(schema, query, ebmDiseases.toArray(String[]::new));
@@ -128,6 +129,7 @@ public class GraphSearch {
         schema = Schemas.TCM; // TCM schema for health report
         StringJoiner tcmJoiner = initializeSchemaJoiner(schema);
         addSegmentsToJoiner(schema, input, entities, tcmJoiner);
+        addCommunitiesToJoiner(schema, input, entities, tcmJoiner);// Default schema for health report
         List<String> tcmDiseases = queryForDiseases(schema, query);
         logger.info("中医: diseases={}", tcmDiseases);
         healthReport = queryForHealthReport(schema, query, tcmDiseases.toArray(String[]::new));
@@ -140,6 +142,7 @@ public class GraphSearch {
         schema = Schemas.NUTR;
         StringJoiner nutrJoiner = initializeSchemaJoiner(schema);
         addSegmentsToJoiner(schema, input, entities, nutrJoiner);
+        addCommunitiesToJoiner(schema, input, entities, nutrJoiner);// Default schema for health report
         healthReport = queryForHealthReport(schema, query, ebmDiseases.toArray(String[]::new));
         nutrJoiner.add(healthReport);
         joiner.add(nutrJoiner.toString());
@@ -173,6 +176,7 @@ public class GraphSearch {
         schema = Schemas.NUTR;
         StringJoiner schemaJoiner = initializeSchemaJoiner(schema);
         addSegmentsToJoiner(schema, input, entities, schemaJoiner);
+        addCommunitiesToJoiner(schema, input, entities, schemaJoiner);// Default schema for health report
         String healthReport = queryForHealthReport(schema, query, diseases.toArray(String[]::new));
         schemaJoiner.add(healthReport);
         joiner.add(schemaJoiner.toString());
@@ -181,6 +185,7 @@ public class GraphSearch {
         schema = Schemas.IMM;
         schemaJoiner = initializeSchemaJoiner(schema);
         addSegmentsToJoiner(schema, input, entities, schemaJoiner);
+        addCommunitiesToJoiner(schema, input, entities, schemaJoiner);// Default schema for health report
         healthReport = queryForHealthReport(schema, query, diseases.toArray(String[]::new));
         schemaJoiner.add(healthReport);
         joiner.add(schemaJoiner.toString());
@@ -189,6 +194,7 @@ public class GraphSearch {
         schema = Schemas.ORGAN;
         schemaJoiner = initializeSchemaJoiner(schema);
         addSegmentsToJoiner(schema, input, entities, schemaJoiner);
+        addCommunitiesToJoiner(schema, input, entities, schemaJoiner);// Default schema for health report
         healthReport = queryForHealthReport(schema, query, diseases.toArray(String[]::new));
         schemaJoiner.add(healthReport);
         joiner.add(schemaJoiner.toString());
@@ -197,6 +203,7 @@ public class GraphSearch {
         schema = Schemas.AGING;
         schemaJoiner = initializeSchemaJoiner(schema);
         addSegmentsToJoiner(schema, input, entities, schemaJoiner);
+        addCommunitiesToJoiner(schema, input, entities, schemaJoiner);// Default schema for health report
         healthReport = queryForHealthReport(schema, query, diseases.toArray(String[]::new));
         schemaJoiner.add(healthReport);
         joiner.add(schemaJoiner.toString());
