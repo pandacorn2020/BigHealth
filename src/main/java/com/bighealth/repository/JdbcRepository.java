@@ -118,7 +118,7 @@ public class JdbcRepository {
 
     // Method to perform semantic search for entities
     public List<KGEntity> semanticSearchForEntities(String schema, String e, int topCount) {
-        String sql = "SELECT * FROM %s.kgentity WHERE name vsearch ? top %d";
+        String sql = "SELECT * FROM %s.kgentity WHERE name match ? top %d";
         sql = String.format(sql, schema, topCount);
         List<KGEntity> entities = jdbcTemplate.query(sql, kgEntityRowMapper, e);
         return entities.stream()
@@ -133,6 +133,7 @@ public class JdbcRepository {
         return entities.stream()
                 .filter(entity -> entity != null)
                 .collect(Collectors.toList());
+        
     }
 
     // Method to get entities
